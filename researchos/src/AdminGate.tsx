@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { FlaskConical, LogIn } from "lucide-react";
+import { clearDriveSession } from "./driveSession";
 
 // This is a browser convenience lock on a public static site, not server authentication.
 const KEY = "researchos-admin-session";
@@ -32,6 +33,7 @@ export default function AdminGate({ children }: { children: ReactNode }) {
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   const signOut = () => {
+    clearDriveSession();
     try {
       localStorage.removeItem(KEY);
     } catch {}

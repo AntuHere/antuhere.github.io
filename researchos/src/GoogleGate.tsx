@@ -7,6 +7,11 @@ import React, {
 } from "react";
 import { FlaskConical, LogIn } from "lucide-react";
 import { DriveClient } from "./drive";
+import {
+  clearDriveSession,
+  readDriveSession,
+  saveDriveSession,
+} from "./driveSession";
 
 declare global {
   interface Window {
@@ -53,6 +58,27 @@ function googleScript() {
   });
   return scriptJob;
 }
+async function verifyAccount(token: string) {
+  const response = await fetch(
+    "https://www.googleapis.com/oauth2/v3/userinfo",
+    { headers: { Authorization: "Bearer " + token } },
+  );
+  if (!response.ok)
+    throw Error(
+      "Google could not verify this Drive connection. Please reconnect.",
+    );
+  const profile = await response.json();
+  if (
+    profile.email_verified !== true ||
+    String(profile.email).toLowerCase() !== OWNER
+  ) {
+    window.google?.accounts?.oauth2?.revoke?.(token);
+    throw Error(
+      "This workspace is for " + OWNER + ". Choose that Google account.",
+    );
+  }
+  return profile;
+}
 export default function GoogleGate({
   children,
 }: {
@@ -70,7 +96,9 @@ export default function GoogleGate({
   const signOut = () => {
     generation.current++;
     if (timer.current) clearTimeout(timer.current);
+    clearDriveSession();
     setSession(null);
+    setBusy(false);
   };
   useEffect(() => {
     let mounted = true;
@@ -118,6 +146,42 @@ export default function GoogleGate({
       active = false;
     };
   }, [clientId]);
+  useEffect(() => {
+    if (!clientId) return;
+    const cached = readDriveSession(clientId);
+    if (!cached) return;
+    const attempt = ++generation.current;
+    let active = true;
+    setBusy(true);
+    void verifyAccount(cached.token)
+      .then((profile) => {
+        if (!active || attempt !== generation.current) return;
+        if (cached.expires <= Date.now()) {
+          clearDriveSession();
+          return;
+        }
+        setError("");
+        const drive = new DriveClient(cached.token, cached.expires, signOut);
+        setSession({
+          email: OWNER,
+          name: profile.name || "Antu",
+          drive,
+          signOut,
+        });
+        timer.current = setTimeout(signOut, cached.expires - Date.now());
+      })
+      .catch((e) => {
+        if (!active || attempt !== generation.current) return;
+        clearDriveSession();
+        setError(e instanceof Error ? e.message : "Please reconnect Drive.");
+      })
+      .finally(() => {
+        if (active && attempt === generation.current) setBusy(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [clientId]);
   const signIn = async () => {
     setError("");
     setBusy(true);
@@ -147,27 +211,15 @@ export default function GoogleGate({
               ),
             ),
         });
-        client.requestAccessToken({ prompt: "select_account" });
+        // Let Google reuse the hinted account and existing consent. A user click
+        // still opens the Google popup when fresh access is needed.
+        client.requestAccessToken({ prompt: "" });
       });
       const token = response.access_token;
       if (!token)
         throw Error("Google did not provide access. Try signing in again.");
-      const profileResponse = await fetch(
-        "https://www.googleapis.com/oauth2/v3/userinfo",
-        { headers: { Authorization: "Bearer " + token } },
-      );
-      if (!profileResponse.ok)
-        throw Error("Google could not verify the signed-in account.");
-      const profile = await profileResponse.json();
-      if (
-        profile.email_verified !== true ||
-        String(profile.email).toLowerCase() !== OWNER
-      ) {
-        window.google.accounts.oauth2.revoke(token);
-        throw Error(
-          "This workspace is for " + OWNER + ". Choose that Google account.",
-        );
-      }
+      const issued = Date.now();
+      const profile = await verifyAccount(token);
       if (
         !String(response.scope || "")
           .split(" ")
@@ -177,8 +229,15 @@ export default function GoogleGate({
           "Drive access was not granted. Sign in again and allow ResearchOS to manage the files it creates.",
         );
       if (attempt !== generation.current) return;
+      const seconds = Number(response.expires_in);
       const expires =
-        Date.now() + Math.max(1, Number(response.expires_in) || 3600) * 1000;
+        issued +
+        Math.min(3600, Math.max(1, Number.isFinite(seconds) ? seconds : 3600)) *
+          1000;
+      if (expires <= Date.now())
+        throw Error(
+          "Google access expired while connecting. Please try again.",
+        );
       const drive = new DriveClient(token, expires, signOut);
       setSession({
         email: OWNER,
@@ -187,8 +246,9 @@ export default function GoogleGate({
         signOut,
       });
       timer.current = setTimeout(signOut, Math.max(1, expires - Date.now()));
-      // Only a public application identifier is remembered. OAuth access tokens
-      // and Google passwords are never persisted in browser storage.
+      saveDriveSession({ token, expires, clientId });
+      // Only the public client ID is saved in long-lived local storage. The
+      // access token stays in this tab and keeps its original Google expiry.
       try {
         localStorage.setItem("researchos-google-client-id", clientId);
       } catch {}
@@ -278,9 +338,9 @@ export default function GoogleGate({
           </p>
         )}
         <small>
-          Drive access may need reconnecting after a reload or expiration. Your
-          admin login and local workspace stay available. Google protects your
-          Drive files.
+          Refreshing this page keeps Drive connected while Google access is
+          valid. Closing the tab or access expiration may require reconnecting.
+          Your workspace login stays remembered separately.
         </small>
       </div>
     </section>

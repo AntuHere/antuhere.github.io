@@ -11,7 +11,9 @@ export async function mockGoogle(
   const files: any[] = [];
   const contents = new Map<string, Buffer>();
   let serial = 0,
-    failUploads = 0;
+    failUploads = 0,
+    profileRequests = 0,
+    rejectProfile = false;
   await page.route("**/researchos/google-config.json", (route) =>
     route.fulfill({
       json: {
@@ -25,7 +27,7 @@ export async function mockGoogle(
   await page.route("https://accounts.google.com/gsi/client", (route) =>
     route.fulfill({
       contentType: "application/javascript",
-      body: `window.google={accounts:{oauth2:{revoke:()=>{},initTokenClient:(config)=>({requestAccessToken:()=>config.callback(${JSON.stringify(options.denied ? { error: "access_denied" } : { access_token: "test-only-token", expires_in: options.expire || 3600, scope: "https://www.googleapis.com/auth/drive.file openid email profile" })})})}}};`,
+      body: `window.googleRequests=[];window.google={accounts:{oauth2:{revoke:()=>{},initTokenClient:(config)=>({requestAccessToken:(options)=>{window.googleRequests.push(options);config.callback(${JSON.stringify(options.denied ? { error: "access_denied" } : { access_token: "test-only-token", expires_in: options.expire || 3600, scope: "https://www.googleapis.com/auth/drive.file openid email profile" })});}})}}};`,
     }),
   );
   await page.route("https://www.googleapis.com/**", async (route) => {
@@ -36,7 +38,13 @@ export async function mockGoogle(
         status: 401,
         json: { error: { message: "Missing access token" } },
       });
-    if (url.pathname.includes("/userinfo"))
+    if (url.pathname.includes("/userinfo")) {
+      profileRequests++;
+      if (rejectProfile)
+        return route.fulfill({
+          status: 401,
+          json: { error: { message: "Expired Google access" } },
+        });
       return route.fulfill({
         json: {
           email: options.email || "nasfiqul.antu@gmail.com",
@@ -44,6 +52,7 @@ export async function mockGoogle(
           name: "Antu",
         },
       });
+    }
     if (url.pathname.startsWith("/upload/")) {
       if (failUploads > 0) {
         failUploads--;
@@ -107,6 +116,10 @@ export async function mockGoogle(
   return {
     files,
     contents,
+    profileRequests: () => profileRequests,
+    rejectProfile: () => {
+      rejectProfile = true;
+    },
     failNextUpload: () => {
       failUploads++;
     },
@@ -130,9 +143,17 @@ export async function adminSignIn(page: Page) {
 export async function signIn(page: Page) {
   await adminSignIn(page);
   await navigate(page, "Settings");
-  await page
-    .getByRole("button", { name: "Sign in with Google", exact: true })
-    .click();
+  const connected = page.getByRole("heading", {
+    name: "Google Drive connected",
+  });
+  const button = page.getByRole("button", {
+    name: "Sign in with Google",
+    exact: true,
+  });
+  await expect(
+    connected.or(button.and(page.locator(":enabled"))),
+  ).toBeVisible();
+  if (!(await connected.isVisible())) await button.click();
   await expect(
     page.getByRole("heading", { name: "Google Drive connected" }),
   ).toBeVisible();
