@@ -2174,3 +2174,63 @@ select:focus-visible {
     max-width: 100%;
   }
 }
+.admin-login-form {
+  display: grid;
+  gap: 18px;
+}
+.admin-login-form .field {
+  display: grid;
+  gap: 8px;
+}
+.admin-login-form .field input {
+  width: 100%;
+  padding: 12px;
+  background: #242c40;
+  border: 1px solid #505c7c;
+  color: white;
+  border-radius: 8px;
+}
+.remember-login {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.remember-login input {
+  width: 18px;
+  height: 18px;
+  accent-color: #8574fa;
+}
+.drive-connection p,
+.drive-connection small {
+  line-height: 1.65;
+}
+.drive-connection .signin-setup {
+  margin: 16px 0;
+  background: var(--input);
+  color: var(--text);
+}
+.drive-connection .signin-setup input {
+  width: 100%;
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.drive-connection .signin-setup p {
+  margin: 12px 0;
+}
+.drive-connection code {
+  overflow-wrap: anywhere;
+}
+.drive-connection button {
+  margin: 12px 8px 12px 0;
+}
+.drive-connection small {
+  display: block;
+}
+.drive-connection .signin-brand {
+  font-size: 18px;
+  margin-bottom: 16px;
+}

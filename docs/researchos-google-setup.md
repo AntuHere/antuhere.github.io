@@ -1,6 +1,8 @@
 # Connect ResearchOS to your Google Drive
 
-ResearchOS is published at https://antuhere.github.io/researchos/. The code is ready for Google sign-in and Drive uploads. **Google authentication and live uploads cannot work until you create a Web client ID.** No Google password, API key, service account, or client secret belongs in the site or in chat.
+ResearchOS is published at https://antuhere.github.io/researchos/. Open it on your phone or laptop and log in with username **admin**, password **admin**. **Remember me on this browser** is enabled by default. This is a convenience lock on a public static site, not secure server authentication. Signing out clears the remembered login without deleting your local workspace.
+
+Google is optional: notes, project records, the tracker and local file uploads work without it. Connect Google Drive in **Settings** (or a project’s **Documents vault**) only when you want cloud file uploads. Google authentication and live Drive uploads require a Web client ID. No Google password, API key, service account, or client secret belongs in the site or in chat.
 
 ## One-time setup (your Google account)
 
@@ -15,11 +17,11 @@ ResearchOS is published at https://antuhere.github.io/researchos/. The code is r
    ```
    The origin has no `/researchos/` path or trailing slash. This implementation uses a Google popup/token flow, so **Authorized redirect URIs can be left empty**. For local development only, optionally add the exact local origin you use, e.g. `http://localhost:5173`.
 7. Copy the **Client ID**, which ends in `.apps.googleusercontent.com`. Do not copy the client secret.
-8. Visit [ResearchOS](https://antuhere.github.io/researchos/), paste the client ID into the one-time setup field, and click **Sign in with Google**. Choose `nasfiqul.antu@gmail.com` and grant Drive file access. Allow the Google popup. Changes in Google Cloud may take a few minutes to apply.
+8. Visit [ResearchOS](https://antuhere.github.io/researchos/), log in with `admin` / `admin`, open **Settings**, paste the client ID into the Drive setup field, and click **Sign in with Google**. Choose `nasfiqul.antu@gmail.com` and grant Drive file access. Allow the Google popup. Changes in Google Cloud may take a few minutes to apply.
 
 The public client ID is remembered after a successful sign-in. Repeat step 8 on your phone. For setup without entering it on every browser, put the public client ID in `researchos/public/google-config.json` and rebuild/deploy. **Never put a client secret in that file.** The owner account is fixed in `GoogleGate.tsx`; changing the JSON email does not change the permitted owner.
 
-If Google reports `origin_mismatch`, check step 6. If access is blocked in Testing mode, check the test user and scopes. If Drive returns `accessNotConfigured`, enable Drive API in the same project that owns the client ID. A Testing application may require renewed consent after seven days; Google also expires short-lived access tokens, generally around an hour. ResearchOS asks you to sign in again when access expires. Google remembers its own account session; ResearchOS keeps access tokens only in memory, so a page reload also requires sign-in.
+If Google reports `origin_mismatch`, check step 6. If access is blocked in Testing mode, check the test user and scopes. If Drive returns `accessNotConfigured`, enable Drive API in the same project that owns the client ID. A Testing application may require renewed consent after seven days; Google also expires short-lived access tokens, generally around an hour. ResearchOS disconnects Drive when access expires. Your admin login and local workspace remain available. Google remembers its own account session; ResearchOS keeps Google access tokens only in memory, so reconnect Drive after a page reload when you need cloud file access.
 
 ## Your project folders and documents
 
@@ -50,10 +52,10 @@ Sticky notes support direct editing, colors and pins. The paper sheet supports a
 
 ## Access and AI limits
 
-The sign-in screen mounts the workspace only after Google verifies the selected owner account. GitHub Pages still serves the application code publicly. A frontend gate cannot prevent someone modifying their own copy of the app, and it is not a server-protected private website. Google Drive independently checks OAuth authorization for every file request. Local browser data remains on your device after sign-out; use your own device/account, and export a backup before clearing browser storage. No research document contents or OAuth tokens are committed to the repository.
+The admin screen checks `admin` / `admin` in the browser and remembers a login flag when selected; it does not save the password. Anyone can inspect the public app code or bypass this convenience lock. It cannot enforce private access on GitHub Pages. Google independently verifies the owner account `nasfiqul.antu@gmail.com` and checks OAuth authorization for Drive file requests. Admin login alone never grants access to Drive. Signing out unmounts the Drive connection and clears its in-memory access token, while local notes and browser file copies remain on your device. No research file contents or Google access tokens are committed to the repository.
 
 The **AI assistant** panel prepares and copies a project-context prompt. It makes no AI requests yet. A later connection needs a private backend that verifies user identity and stores AI service credentials on the server. Do not paste AI API keys into the frontend, public configuration, or browser storage.
 
 ## Validation
 
-Run `npm run build`, the ResearchOS TypeScript check, and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:researchos -- --workers=1`. Integration tests simulate Google sign-in and Drive responses: they verify owner rejection, access denial, folder/category creation, uploads, recovery/retry, original-byte downloads, previews, sticky-note persistence, sheet exports, and existing portfolio/workspace behavior. They do **not** prove live OAuth configuration or live Google Drive access. Complete the one-time setup above to validate those against your account.
+Run `npm run build`, the ResearchOS TypeScript check, and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:researchos -- --workers=1`. Integration tests simulate Google sign-in and Drive responses: they verify admin login, remembered access, sign-out, optional Drive connection, owner rejection, access denial, folder/category creation, uploads, recovery/retry, original-byte downloads, previews, sticky-note persistence, sheet exports, and existing portfolio/workspace behavior. They do **not** prove live OAuth configuration or live Google Drive access. Complete the one-time setup above to validate those against your account.

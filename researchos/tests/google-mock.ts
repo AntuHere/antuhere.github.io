@@ -112,10 +112,26 @@ export async function mockGoogle(
     },
   };
 }
+export async function adminSignIn(page: Page) {
+  if (await page.getByRole("heading", { name: "Admin login" }).isVisible()) {
+    await page.getByLabel("Username", { exact: true }).fill("admin");
+    await page.getByLabel("Password", { exact: true }).fill("admin");
+    await page.getByRole("button", { name: "Log in", exact: true }).click();
+  }
+  await expect(
+    page.getByRole("heading", { name: "Good to see you back." }),
+  ).toBeVisible();
+}
 export async function signIn(page: Page) {
+  await adminSignIn(page);
+  await navigate(page, "Settings");
   await page
     .getByRole("button", { name: "Sign in with Google", exact: true })
     .click();
+  await expect(
+    page.getByRole("heading", { name: "Google Drive connected" }),
+  ).toBeVisible();
+  await navigate(page, "Overview");
   await expect(
     page.getByRole("heading", { name: "Good to see you back." }),
   ).toBeVisible();

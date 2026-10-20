@@ -1,3 +1,4 @@
+import AdminGate, { useAdmin } from "./AdminGate";
 import GoogleGate, { useGoogle } from "./GoogleGate";
 import StickyNotes from "./StickyNotes";
 import LiteratureSheet from "./LiteratureSheet";
@@ -98,7 +99,8 @@ const fmt = (date: string) =>
     : "No deadline";
 const nl = (n: number) => String(n).padStart(2, "0");
 function App() {
-  const { drive, email, signOut } = useGoogle();
+  const { drive, email, connection } = useGoogle();
+  const { signOut } = useAdmin();
   const [proposal, setProposal] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [db, setDb] = useState<Store>(loadStore);
@@ -249,9 +251,17 @@ function App() {
         return;
       }
       editing ? patch("projects", editing, x) : mutate("projects", x);
-      setSaving(true);
       setDriveError("");
       setModal(null);
+      if (!drive) {
+        setSaving(false);
+        notify(
+          attachment
+            ? "Project and proposal saved in this browser. Connect Drive later to upload."
+            : "Project saved in this browser",
+        );
+        return;
+      }
       try {
         await drive.ensureProject(x);
         if (attachment) await syncFile(drive, x, attachment);
@@ -588,9 +598,15 @@ function App() {
           <div className="local-storage-banner">
             <ShieldCheck size={16} />
             <span>
-              <strong>Google Drive connected</strong> · Files sync through each
-              project’s vault. Notes, tasks and tracking sheets stay in this
-              browser; export/import a backup to move them between devices.
+              <strong>
+                {drive ? "Google Drive connected" : "Local workspace"}
+              </strong>{" "}
+              ·{" "}
+              {drive
+                ? "Files sync through each project’s vault."
+                : "Files save in this browser. Connect Drive in Settings when you want uploads."}{" "}
+              Notes, tasks and tracking sheets stay in this browser;
+              export/import a backup to move them between devices.
             </span>
             <button
               onClick={() => {
@@ -1410,6 +1426,7 @@ function App() {
                 desc="Control how your local workspace is saved and backed up."
               />
               <div className="settings-grid">
+                {connection}
                 <section className="panel settings-panel">
                   <div className="settings-icon">
                     <Download size={22} />
@@ -2080,7 +2097,9 @@ function Empty({ text }: { text: string }) {
   );
 }
 createRoot(document.getElementById("root")!).render(
-  <GoogleGate>
-    <App />
-  </GoogleGate>,
+  <AdminGate>
+    <GoogleGate>
+      <App />
+    </GoogleGate>
+  </AdminGate>,
 );

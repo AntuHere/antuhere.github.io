@@ -1,13 +1,15 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { zipSync, strToU8 } from "fflate";
-import { mockGoogle, signIn, navigate } from "./google-mock";
+import { mockGoogle, signIn, adminSignIn, navigate } from "./google-mock";
 
-test("unconfigured, wrong-account and denied sign-in keep workspace closed", async ({
+test("unconfigured, wrong-account and denied Drive connections leave local workspace available", async ({
   page,
 }) => {
   await mockGoogle(page, { configured: false });
   await page.goto("/researchos/");
+  await adminSignIn(page);
+  await navigate(page, "Settings");
   await expect(page.getByLabel("Google OAuth Web client ID")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Sign in with Google" }),
@@ -15,18 +17,29 @@ test("unconfigured, wrong-account and denied sign-in keep workspace closed", asy
   await expect(
     page.getByRole("heading", { name: "Good to see you back." }),
   ).toHaveCount(0);
+  await expect(page.locator(".app")).toHaveCount(1);
   await mockGoogle(page, { email: "someone@example.com" });
   await page.reload();
+  await adminSignIn(page);
+  await navigate(page, "Settings");
   await page.getByRole("button", { name: "Sign in with Google" }).click();
   await expect(page.getByRole("alert")).toContainText(
     "Choose that Google account",
   );
-  await expect(page.locator(".app")).toHaveCount(0);
+  await expect(page.locator(".app")).toHaveCount(1);
+  await expect(
+    page.getByRole("heading", { name: "Google Drive connected" }),
+  ).toHaveCount(0);
   await mockGoogle(page, { denied: true });
   await page.reload();
+  await adminSignIn(page);
+  await navigate(page, "Settings");
   await page.getByRole("button", { name: "Sign in with Google" }).click();
   await expect(page.getByRole("alert")).toContainText("access_denied");
-  await expect(page.locator(".app")).toHaveCount(0);
+  await expect(page.locator(".app")).toHaveCount(1);
+  await expect(
+    page.getByRole("heading", { name: "Google Drive connected" }),
+  ).toHaveCount(0);
 });
 
 test("sticky notes and paper sheet autosave and export safely, sign-out clears access", async ({
@@ -98,7 +111,7 @@ test("sticky notes and paper sheet autosave and export safely, sign-out clears a
   );
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Your research workspace" }),
+    page.getByRole("heading", { name: "Admin login" }),
   ).toBeVisible();
   await expect(page.locator(".app")).toHaveCount(0);
 });
@@ -115,13 +128,11 @@ test("project creation uploads proposal, retries interrupted files, previews PDF
     .click();
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Project name").fill("Shared device research");
-  await dialog
-    .getByLabel("Research proposal file (optional)")
-    .setInputFiles({
-      name: "proposal.pdf",
-      mimeType: "application/pdf",
-      buffer: Buffer.from("%PDF-1.4\nproposal"),
-    });
+  await dialog.getByLabel("Research proposal file (optional)").setInputFiles({
+    name: "proposal.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("%PDF-1.4\nproposal"),
+  });
   await dialog.getByRole("button", { name: "Save to workspace" }).click();
   await expect(page.getByText("Project folder ready in Drive")).toBeVisible();
   expect(
@@ -164,14 +175,12 @@ test("project creation uploads proposal, retries interrupted files, previews PDF
       '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Original review text &lt;script&gt;safe&lt;/script&gt;</w:t></w:r></w:p></w:body></w:document>',
     ),
   });
-  await page
-    .getByLabel("Upload files", { exact: true })
-    .setInputFiles({
-      name: "review.docx",
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      buffer: Buffer.from(docx),
-    });
+  await page.getByLabel("Upload files", { exact: true }).setInputFiles({
+    name: "review.docx",
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    buffer: Buffer.from(docx),
+  });
   await expect(page.getByRole("alert")).toContainText(
     "Simulated upload interruption",
   );
@@ -273,7 +282,7 @@ test("legacy browser files retain original bytes and migrate through pending upl
   expect(saved.parents[0]).toBe(drive.files.find((f) => f.name === "Other").id);
 });
 
-test("expired Google access returns to sign-in and preserves browser records", async ({
+test("expired Drive access preserves admin login and local workspace", async ({
   page,
 }) => {
   await page.clock.install();
@@ -284,10 +293,17 @@ test("expired Google access returns to sign-in and preserves browser records", a
   await page.getByRole("button", { name: "Quick sticky note" }).click();
   await page.getByLabel("Sticky note title").last().fill("Keep after expiry");
   await page.clock.fastForward(11000);
+  await expect(page.getByLabel("Sticky note title").last()).toHaveValue(
+    "Keep after expiry",
+  );
+  await expect(page.locator(".app")).toHaveCount(1);
+  await navigate(page, "Settings");
   await expect(
-    page.getByRole("heading", { name: "Your research workspace" }),
+    page.getByRole("button", { name: "Sign in with Google" }),
   ).toBeVisible();
-  await expect(page.locator(".app")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Google Drive connected" }),
+  ).toHaveCount(0);
   expect(
     await page.evaluate(() =>
       JSON.parse(localStorage.getItem("researchos-mvp-v1")!).notes.some(

@@ -19,7 +19,12 @@ export type Session = {
   drive: DriveClient;
   signOut: () => void;
 };
-const GoogleSession = createContext<Session | null>(null);
+type GoogleConnection = {
+  email: string;
+  drive: DriveClient | null;
+  connection: React.ReactNode;
+};
+const GoogleSession = createContext<GoogleConnection | null>(null);
 export const useGoogle = () => {
   const value = useContext(GoogleSession);
   if (!value) throw Error("Google sign-in required");
@@ -86,7 +91,7 @@ export default function GoogleGate({
       .catch(() => {
         if (mounted)
           setError(
-            "Google sign-in configuration could not load. Reload to try again.",
+            "Drive configuration could not load. Your local workspace is still available.",
           );
       })
       .finally(() => {
@@ -194,23 +199,25 @@ export default function GoogleGate({
       if (attempt === generation.current) setBusy(false);
     }
   };
-  if (session)
-    return (
-      <GoogleSession.Provider value={session}>
-        {children}
-      </GoogleSession.Provider>
-    );
-  return (
-    <main className="signin-page">
-      <section className="signin-card">
+  const connection = session ? (
+    <section className="panel settings-panel">
+      <h3>Google Drive connected</h3>
+      <p>{session.email}</p>
+      <button className="secondary" onClick={signOut}>
+        Disconnect Drive
+      </button>
+    </section>
+  ) : (
+    <section className="panel settings-panel drive-connection">
+      <div>
         <div className="signin-brand">
           <FlaskConical size={30} />
           <strong>ResearchOS</strong>
         </div>
-        <h1>Your research workspace</h1>
+        <h3>Connect Google Drive (optional)</h3>
         <p>
-          Sign in with <strong>{OWNER}</strong> to open your workspace and
-          connect your private Google Drive files.
+          Connect <strong>{OWNER}</strong> for Drive uploads. Your workspace
+          works without this connection.
         </p>
         {!ready ? (
           <p role="status">Loading sign-in…</p>
@@ -220,8 +227,8 @@ export default function GoogleGate({
               <details open className="signin-setup">
                 <summary>One-time Google connection setup</summary>
                 <p>
-                  A Google OAuth Web client ID is needed to activate sign-in. It
-                  is public configuration, not a password or client secret.
+                  A Google OAuth Web client ID is needed only to connect Drive.
+                  It is public configuration, not a password or client secret.
                 </p>
                 <label className="field">
                   <span>Google OAuth Web client ID</span>
@@ -271,13 +278,22 @@ export default function GoogleGate({
           </p>
         )}
         <small>
-          Google can remember your account in this browser. Drive access expires
-          periodically and may need reconnecting. This screen gates the app;
-          Google enforces access to your Drive files. GitHub Pages still serves
-          the app code publicly.
+          Drive access may need reconnecting after a reload or expiration. Your
+          admin login and local workspace stay available. Google protects your
+          Drive files.
         </small>
-        <a href="/">Back to portfolio</a>
-      </section>
-    </main>
+      </div>
+    </section>
+  );
+  return (
+    <GoogleSession.Provider
+      value={{
+        drive: session?.drive || null,
+        email: session?.email || "admin",
+        connection,
+      }}
+    >
+      {children}
+    </GoogleSession.Provider>
   );
 }

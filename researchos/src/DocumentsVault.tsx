@@ -23,7 +23,7 @@ export default function DocumentsVault({
   links: Asset[];
   onAddLink: () => void;
 }) {
-  const { drive } = useGoogle();
+  const { drive, connection } = useGoogle();
   const [local, setLocal] = useState<VaultRecord[]>([]),
     [remote, setRemote] = useState<Remote[]>([]),
     [category, setCategory] = useState<Category>("Papers"),
@@ -47,6 +47,11 @@ export default function DocumentsVault({
   const loadLocal = async () =>
     setLocal((await getVault()).filter((x) => x.projectId === project.id));
   const loadDrive = async () => {
+    if (!drive) {
+      setRemote([]);
+      setFolder("");
+      return;
+    }
     const f = await drive.ensureProject(project);
     setFolder("https://drive.google.com/drive/folders/" + f.id);
     const documents = await drive.documents(project);
@@ -92,7 +97,7 @@ export default function DocumentsVault({
       const failures: string[] = [];
       for (const record of records) {
         try {
-          await syncFile(drive, project, record);
+          if (drive) await syncFile(drive, project, record);
         } catch (e) {
           failures.push(record.name + ": " + (e as Error).message);
         }
@@ -131,7 +136,10 @@ export default function DocumentsVault({
   ].filter((x) => filter === "All" || x.category === filter);
   const open = async (item: (typeof items)[number], download = false) =>
     run(async () => {
-      const blob = item.local?.file || (await drive.download(item.remote!.id));
+      const blob =
+        item.local?.file ||
+        (drive ? await drive.download(item.remote!.id) : undefined);
+      if (!blob) throw Error("Connect Drive to download this file.");
       const url = URL.createObjectURL(blob);
       if (download) {
         const a = document.createElement("a");
@@ -190,10 +198,14 @@ export default function DocumentsVault({
     });
   return (
     <div className="rw-pane">
+      {!drive && connection}
       <div className="rw-section-heading">
         <div>
           <h3>Research documents & files</h3>
-          <p>Private Google Drive files, organized by project and category.</p>
+          <p>
+            Files organized by project and category. Drive connection is
+            optional.
+          </p>
         </div>
         <div className="rw-actions">
           {folder && (
@@ -208,7 +220,7 @@ export default function DocumentsVault({
           )}
           <button
             className="rw-button"
-            disabled={busy}
+            disabled={busy || !drive}
             onClick={() => void run(loadDrive)}
           >
             Refresh Drive
@@ -259,11 +271,13 @@ export default function DocumentsVault({
       {pending.length > 0 && (
         <div className="rw-caution">
           {pending.length} pending upload(s).{" "}
+          {!drive && "Saved in this browser. Connect Drive to upload."}{" "}
           <button
             className="rw-button"
-            disabled={busy}
+            disabled={busy || !drive}
             onClick={() =>
               void run(async () => {
+                if (!drive) return;
                 for (const r of pending) await syncFile(drive, project, r);
                 await loadDrive();
               })
