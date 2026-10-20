@@ -1,21 +1,15 @@
 {
-  "main.css": "static/css/main.29c7b3ce.css",
-  "main.css.map": "static/css/main.29c7b3ce.css.map",
-  "main.js": "static/js/main.f3cb2bd9.js",
-  "main.js.map": "static/js/main.f3cb2bd9.js.map",
-  "static/js/0.a5e07612.chunk.js": "static/js/0.a5e07612.chunk.js",
-  "static/js/0.a5e07612.chunk.js.map": "static/js/0.a5e07612.chunk.js.map",
-  "static/js/1.49cc6c4e.chunk.js": "static/js/1.49cc6c4e.chunk.js",
-  "static/js/1.49cc6c4e.chunk.js.map": "static/js/1.49cc6c4e.chunk.js.map",
+  "main.css": "static/css/main.65319c99.css",
+  "main.css.map": "static/css/main.65319c99.css.map",
+  "main.js": "static/js/main.b7cd149b.js",
+  "main.js.map": "static/js/main.b7cd149b.js.map",
+  "static/js/0.991762e4.chunk.js": "static/js/0.991762e4.chunk.js",
+  "static/js/0.991762e4.chunk.js.map": "static/js/0.991762e4.chunk.js.map",
   "static/media/Agustina.woff": "static/media/Agustina.21f233e1.woff",
   "static/media/BiamLogo.jpg": "static/media/BiamLogo.3f8158af.jpg",
-  "static/media/ComingSoon.jpg": "static/media/ComingSoon.8761e506.jpg",
   "static/media/DCLogo.png": "static/media/DCLogo.8da7c666.png",
   "static/media/Montserrat-Regular.ttf": "static/media/Montserrat-Regular.ee653992.ttf",
-  "static/media/cloud1.png": "static/media/cloud1.cc827d04.png",
-  "static/media/contactMailDark.svg": "static/media/contactMailDark.51cf7192.svg",
   "static/media/developerActivity.svg": "static/media/developerActivity.59389695.svg",
   "static/media/manOnTable.svg": "static/media/manOnTable.52be3144.svg",
-  "static/media/skill.svg": "static/media/skill.34409398.svg",
-  "static/media/socialEngi.png": "static/media/socialEngi.f647e2cd.png"
+  "static/media/skill.svg": "static/media/skill.34409398.svg"
 }
