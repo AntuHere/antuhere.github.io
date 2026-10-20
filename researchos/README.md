@@ -47,7 +47,7 @@ After deployment, visit **https://antuhere.github.io/researchos/** from either d
 This first version uses **local storage with manual backup**, as requested:
 
 - Projects, tasks, literature, notes and planned collaborators live in this browser's localStorage.
-- Each project's nine research stages, checklists and working notes save separately.
+- Each project's nine pipeline stages have separate custom work steps and sticky notes. Add your own to-dos; no fixed checklist is shown. Existing working notes become editable stage sticky notes.
 - Uploaded documents live in this browser's IndexedDB. They survive reloads, but they are not uploaded to a server.
 - **Settings → Export backup** downloads JSON containing records and stage workflows. On another device, use **Settings → Import backup**. Import replaces that device's workspace; it does not merge changes.
 - JSON backup does **not** contain uploaded document contents. Keep originals in Drive or another file store and attach their links for use across devices.

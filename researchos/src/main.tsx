@@ -1434,9 +1434,9 @@ function App() {
                   <h3>Backup your research workspace</h3>
                   <p>
                     Download projects, tasks, references, notes, asset links,
-                    collaborators, and stage checklists as JSON. Uploaded
-                    document contents are not included; keep originals
-                    separately.
+                    collaborators, stage work steps, and stage sticky notes as
+                    JSON. Uploaded document contents are not included; keep
+                    originals separately.
                   </p>
                   <button className="primary" onClick={exportData}>
                     <Download size={17} /> Export backup
@@ -1486,9 +1486,9 @@ function App() {
                   <h3>Reset demo workspace</h3>
                   <p>
                     Restore the six example research projects and their demo
-                    resources. Current records and stage checklists will be
-                    overwritten. Uploaded document copies are kept in this
-                    browser.
+                    resources. Current records, stage work steps and stage notes
+                    will be overwritten. Uploaded document copies are kept in
+                    this browser.
                   </p>
                   <button
                     className="danger-button"

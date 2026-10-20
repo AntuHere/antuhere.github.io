@@ -1,3 +1,11 @@
+import StageTodos from "./StageTodos";
+import {
+  loadStages,
+  stagesKey,
+  stagesOf,
+  type StageData,
+  type WorkflowData,
+} from "./workflow";
 import DocumentsVault from "./DocumentsVault";
 import StickyNotes from "./StickyNotes";
 import LiteratureSheet from "./LiteratureSheet";
@@ -20,115 +28,40 @@ const STAGES = [
   {
     title: "Research concept",
     description: "Problem, objectives, hypotheses and scope",
-    checks: [
-      "Define problem statement",
-      "Write objectives and research questions",
-      "Assess novelty and feasibility",
-      "Confirm scope and expected contribution",
-    ],
   },
   {
     title: "Literature review",
     description: "Search, compare and synthesize evidence",
-    checks: [
-      "Create search strategy and keywords",
-      "Collect core references",
-      "Build literature comparison matrix",
-      "Summarize research gaps",
-    ],
   },
   {
     title: "Research methodology",
     description: "Design, variables, evaluation and reproducibility",
-    checks: [
-      "Specify study design",
-      "Define variables and metrics",
-      "Plan validation and analysis",
-      "Document methodology and limitations",
-    ],
   },
   {
     title: "Data collection",
     description: "Source, record and document datasets",
-    checks: [
-      "Finalize collection protocol",
-      "Organize raw data and field notes",
-      "Record metadata and provenance",
-      "Verify dataset quality",
-    ],
   },
   {
     title: "Data processing",
     description: "Cleaning, annotation and preparation",
-    checks: [
-      "Clean and organize data",
-      "Document preprocessing steps",
-      "Prepare annotated/analysis-ready files",
-      "Perform quality assurance",
-    ],
   },
   {
     title: "Model & experiments",
     description: "Implementation, baseline tests and validation",
-    checks: [
-      "Establish baseline method",
-      "Implement experiments",
-      "Track model versions and parameters",
-      "Validate errors and uncertainty",
-    ],
   },
   {
     title: "Analysis & results",
     description: "Evidence, interpretation and figures",
-    checks: [
-      "Run planned analyses",
-      "Prepare tables and visualizations",
-      "Interpret findings against objectives",
-      "Document robustness and limitations",
-    ],
   },
   {
     title: "Manuscript writing",
     description: "Turn findings into a coherent paper",
-    checks: [
-      "Draft abstract and introduction",
-      "Write methods and results",
-      "Write discussion and conclusion",
-      "Review references, figures and formatting",
-    ],
   },
   {
     title: "Review & submission",
     description: "Finalize and submit",
-    checks: [
-      "Address supervisor comments",
-      "Check target journal requirements",
-      "Complete final manuscript checks",
-      "Record submission and revision history",
-    ],
   },
 ] as const;
-type StageData = {
-  checked: boolean[];
-  notes: string;
-  status: "Not started" | "In progress" | "Complete";
-};
-type WorkflowData = Record<string, StageData>;
-const stagesKey = (id: string) => "researchos-stages-" + id;
-function loadStages(id: string): WorkflowData {
-  try {
-    return JSON.parse(localStorage.getItem(stagesKey(id)) || "{}");
-  } catch {
-    return {};
-  }
-}
-const stagesOf = (state: WorkflowData, i: number): StageData =>
-  state[String(i)] || {
-    checked: [false, false, false, false],
-    notes: "",
-    status: "Not started",
-  };
-
 interface Props {
   project: Project;
   store: Store;
@@ -178,15 +111,18 @@ export default function ResearchWorkspace({
     }
   }, [project.id, state]);
   const updateStage = (i: number, changes: Partial<StageData>) =>
-    setState((s) => ({ ...s, [i]: { ...stagesOf(s, i), ...changes } }));
-  const selected = stagesOf(state, stage);
+    setState((s) => ({
+      ...s,
+      [i]: { ...stagesOf(s, i, project.id), ...changes },
+    }));
+  const selected = stagesOf(state, stage, project.id);
   const completedStages = STAGES.filter(
-    (_, i) => stagesOf(state, i).status === "Complete",
+    (_, i) => stagesOf(state, i, project.id).status === "Complete",
   ).length;
-  const checklistCount = STAGES.reduce(
-    (sum, _, i) => sum + stagesOf(state, i).checked.filter(Boolean).length,
-    0,
+  const allTodos = STAGES.flatMap(
+    (_, i) => stagesOf(state, i, project.id).todos,
   );
+  const completedTodos = allTodos.filter((todo) => todo.done).length;
   const notes = store.notes.filter((n) => n.projectId === project.id);
   const papers = store.papers.filter((p) => p.projectId === project.id);
   const tasks = store.tasks.filter((t) => t.projectId === project.id);
@@ -244,17 +180,24 @@ export default function ResearchWorkspace({
           <aside className="rw-stages">
             <div className="rw-stages-top">
               <b>Research pipeline</b>
-              <span>{checklistCount}/36 checks</span>
+              <span>
+                {completedTodos}/{allTodos.length} work steps
+              </span>
             </div>
             <div className="rw-stage-progress">
-              <div style={{ width: `${(checklistCount / 36) * 100}%` }} />
+              <div
+                style={{
+                  width: `${allTodos.length ? (completedTodos / allTodos.length) * 100 : 0}%`,
+                }}
+              />
             </div>
             {STAGES.map((s, i) => {
-              const d = stagesOf(state, i);
+              const d = stagesOf(state, i, project.id);
               return (
                 <button
                   key={s.title}
                   className={`rw-stage ${stage === i ? "active" : ""}`}
+                  aria-current={stage === i ? "step" : undefined}
                   onClick={() => setStage(i)}
                 >
                   <span
@@ -269,7 +212,8 @@ export default function ResearchWorkspace({
                   <span className="rw-stage-label">
                     <b>{s.title}</b>
                     <small>
-                      {d.status} · {d.checked.filter(Boolean).length}/4
+                      {d.status} · {d.todos.filter((todo) => todo.done).length}/
+                      {d.todos.length} steps
                     </small>
                   </span>
                   <ChevronRight size={15} />
@@ -300,41 +244,44 @@ export default function ResearchWorkspace({
                 <option>Complete</option>
               </select>
             </div>
-            <div className="rw-inner-card">
-              <h4>Stage checklist</h4>
-              {STAGES[stage].checks.map((item, i) => (
-                <label className="rw-check" key={item}>
-                  <input
-                    type="checkbox"
-                    checked={selected.checked[i] || false}
-                    onChange={(e) => {
-                      const checked = [...selected.checked];
-                      checked[i] = e.target.checked;
-                      updateStage(stage, { checked });
-                    }}
-                  />
-                  <span>{item}</span>
-                </label>
-              ))}
-              <div className="rw-hint">
-                Checklists are editable by status and saved automatically in
-                this browser.
-              </div>
-            </div>
-            <div className="rw-inner-card">
+            <StageTodos
+              key={stage}
+              todos={selected.todos}
+              onChange={(todos) => updateStage(stage, { todos })}
+            />
+            <div className="rw-inner-card rw-stage-sticky-notes">
               <div className="rw-between">
-                <h4>Working notes for this stage</h4>
+                <h4>Stage sticky notes</h4>
                 <span className="rw-autosave">
                   {saveError ? "Not saved" : "Auto-saved"}
                 </span>
               </div>
-              <textarea
-                aria-label="Working notes for this stage"
-                className="rw-stage-notes"
-                value={selected.notes}
-                onChange={(e) => updateStage(stage, { notes: e.target.value })}
-                placeholder="Methods, decisions, links, observations, what to do next..."
-                rows={6}
+              <StickyNotes
+                label="Stage sticky notes"
+                projectLocked
+                notes={selected.stickyNotes}
+                projects={[project]}
+                projectId={project.id}
+                onCreate={(note) =>
+                  updateStage(stage, {
+                    stickyNotes: [...selected.stickyNotes, note],
+                  })
+                }
+                onChange={(id, data) =>
+                  updateStage(stage, {
+                    stickyNotes: selected.stickyNotes.map((note) =>
+                      note.id === id ? { ...note, ...data } : note,
+                    ),
+                  })
+                }
+                onDelete={(id) => {
+                  if (confirm("Delete this stage note?"))
+                    updateStage(stage, {
+                      stickyNotes: selected.stickyNotes.filter(
+                        (note) => note.id !== id,
+                      ),
+                    });
+                }}
               />
             </div>
             <div className="rw-actions">
@@ -346,19 +293,6 @@ export default function ResearchWorkspace({
               >
                 <Plus size={15} />
                 Add research task
-              </button>
-              <button
-                className="rw-button"
-                onClick={() =>
-                  onCreate("note", {
-                    projectId: project.id,
-                    title: STAGES[stage].title + " — research notes",
-                    body: selected.notes,
-                  })
-                }
-              >
-                <NotebookPen size={15} />
-                Save as separate note
               </button>
               <button
                 className="rw-button"

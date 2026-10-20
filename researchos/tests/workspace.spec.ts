@@ -1,4 +1,4 @@
-import {mockGoogle,signIn} from "./google-mock";
+import { mockGoogle, signIn } from "./google-mock";
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -30,7 +30,7 @@ test("portfolio navigation and direct Pages paths work on desktop and phone", as
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(
-    page.getByRole("heading", {name: /Nasfiqul Islam Antu/}).first(),
+    page.getByRole("heading", { name: /Nasfiqul Islam Antu/ }).first(),
   ).toBeVisible();
   if (await page.locator(".menu-icon").isVisible())
     await page.locator(".menu-icon").click();
@@ -106,12 +106,13 @@ test("create and edit a project, complete a task, and persist a note", async ({
     .click();
   await dialog.getByLabel("Task title").fill("Collect field observations");
   await dialog.getByRole("button", { name: "Save to workspace" }).click();
-  await page.getByRole("button", { name: "Save as separate note" }).click();
-  await dialog.getByLabel("Note title").fill("Field decisions");
-  await dialog
-    .getByLabel("Notes", { exact: true })
+  await page.getByRole("tab", { name: "Research notes", exact: true }).click();
+  await page.getByRole("button", { name: "Quick sticky note" }).click();
+  await page.getByLabel("Sticky note title").last().fill("Field decisions");
+  await page
+    .getByLabel("Sticky note text")
+    .last()
     .fill("Sample each location twice.");
-  await dialog.getByRole("button", { name: "Save to workspace" }).click();
   await navigate(page, "Task board");
   const card = page
     .locator(".task-card")
@@ -127,65 +128,99 @@ test("create and edit a project, complete a task, and persist a note", async ({
   await signIn(page);
   await navigate(page, "Research notes");
   await expect(
-    page.getByRole("textbox",{name:"Sticky note text"}).last(),
+    page.getByRole("textbox", { name: "Sticky note text" }).last(),
   ).toHaveValue("Sample each location twice.");
 });
 
-test("project stages remain isolated and JSON backup restores records and workflows", async ({
+test("project stages remain isolated and JSON backup restores custom work steps and sticky notes", async ({
   page,
 }) => {
   await page.goto("/researchos/");
   await signIn(page);
   await navigate(page, "Rickshaw PUDO");
-  await page.getByLabel("Define problem statement").check();
   await page
-    .getByLabel("Working notes for this stage")
-    .fill("Rickshaw observations");
+    .getByLabel("New to-do or work step")
+    .fill("Review hospital access observations");
+  await page.getByRole("button", { name: "Add to-do", exact: true }).click();
+  await page
+    .getByRole("checkbox", {
+      name: "Complete Review hospital access observations",
+    })
+    .check();
+  const notes = page.getByRole("region", {
+    name: "Stage sticky notes",
+    exact: true,
+  });
+  await notes.getByRole("button", { name: "Quick sticky note" }).click();
+  await notes.getByLabel("Sticky note text").fill("Rickshaw observations");
   await navigate(page, "Lateral Movement");
-  await expect(page.getByLabel("Define problem statement")).not.toBeChecked();
-  await expect(page.getByLabel("Working notes for this stage")).toHaveValue("");
-  await page
-    .getByLabel("Working notes for this stage")
-    .fill("Lateral observations");
+  await expect(
+    page.getByRole("textbox", { name: "Work step title", exact: true }),
+  ).toHaveCount(0);
+  await expect(notes.getByLabel("Sticky note text")).toHaveCount(0);
+  await notes.getByRole("button", { name: "Quick sticky note" }).click();
+  await notes.getByLabel("Sticky note text").fill("Lateral observations");
   await navigate(page, "Rickshaw PUDO");
-  await expect(page.getByLabel("Define problem statement")).toBeChecked();
-  await expect(page.getByLabel("Working notes for this stage")).toHaveValue(
+  await expect(
+    page.getByRole("checkbox", {
+      name: "Complete Review hospital access observations",
+    }),
+  ).toBeChecked();
+  await expect(notes.getByLabel("Sticky note text")).toHaveValue(
     "Rickshaw observations",
   );
   await navigate(page, "Settings");
-  const downloadEvent = page.waitForEvent("download");
+  const event = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export backup" }).click();
-  const download = await downloadEvent;
+  const download = await event;
   const data = JSON.parse(await readFile((await download.path())!, "utf8"));
-  expect(data.__stageWorkflows.pudo["0"].notes).toBe("Rickshaw observations");
-  expect(data.__stageWorkflows.lateral["0"].notes).toBe("Lateral observations");
+  expect(data.__stageWorkflows.pudo["0"].todos[0]).toMatchObject({
+    title: "Review hospital access observations",
+    done: true,
+  });
+  expect(data.__stageWorkflows.pudo["0"].stickyNotes[0].body).toBe(
+    "Rickshaw observations",
+  );
+  expect(data.__stageWorkflows.lateral["0"].stickyNotes[0].body).toBe(
+    "Lateral observations",
+  );
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Reset demo data" }).click();
   await navigate(page, "Rickshaw PUDO");
-  await expect(page.getByLabel("Define problem statement")).not.toBeChecked();
+  await expect(
+    page.getByRole("textbox", { name: "Work step title", exact: true }),
+  ).toHaveCount(0);
   await navigate(page, "Settings");
   page.once("dialog", (dialog) => dialog.accept());
-  await page.locator("input[type=file]").setInputFiles({
-    name: "backup.json",
-    mimeType: "application/json",
-    buffer: Buffer.from(JSON.stringify(data)),
-  });
+  await page
+    .locator("input[type=file]")
+    .setInputFiles({
+      name: "backup.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(data)),
+    });
   await expect(
     page.getByText("Backup restored", { exact: true }),
   ).toBeVisible();
   await page.reload();
   await signIn(page);
   await navigate(page, "Rickshaw PUDO");
-  await expect(page.getByLabel("Define problem statement")).toBeChecked();
-  await expect(page.getByLabel("Working notes for this stage")).toHaveValue(
+  await expect(
+    page.getByRole("checkbox", {
+      name: "Complete Review hospital access observations",
+    }),
+  ).toBeChecked();
+  await expect(notes.getByLabel("Sticky note text")).toHaveValue(
     "Rickshaw observations",
   );
   await navigate(page, "Settings");
-  await page.locator("input[type=file]").setInputFiles({
-    name: "bad.json",
-    mimeType: "application/json",
-    buffer: Buffer.from('{"projects":[],"tasks":[]}'),
-  });
+  await page
+    .locator("input[type=file]")
+    .setInputFiles({
+      name: "bad.json",
+      mimeType: "application/json",
+      buffer: Buffer.from('{"projects":[],"tasks":[]}'),
+    });
   await expect(page.getByText(/Could not restore backup/)).toBeVisible();
   expect(
     await page.evaluate(

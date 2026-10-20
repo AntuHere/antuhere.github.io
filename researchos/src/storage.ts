@@ -1,6 +1,6 @@
 import { type Store } from "./data";
 
-type Stage = { checked: boolean[]; notes: string; status: string };
+import type { WorkflowStage as Stage } from "./workflow";
 type Workflows = Record<string, Record<string, Stage>>;
 const fields: Record<keyof Store, string[]> = {
   projects: [
@@ -114,6 +114,41 @@ export function parseBackup(text: string): {
         !["Not started", "In progress", "Complete"].includes(s.status)
       )
         throw Error("Invalid stage");
+      if (s.todos !== undefined) {
+        if (
+          !Array.isArray(s.todos) ||
+          s.todos.some(
+            (todo) =>
+              !todo ||
+              typeof todo.id !== "string" ||
+              !todo.id ||
+              typeof todo.title !== "string" ||
+              typeof todo.done !== "boolean",
+          ) ||
+          new Set(s.todos.map((todo) => todo.id)).size !== s.todos.length
+        )
+          throw Error("Invalid stage to-do list");
+      }
+      if (s.stickyNotes !== undefined) {
+        if (
+          !Array.isArray(s.stickyNotes) ||
+          s.stickyNotes.some(
+            (note) =>
+              !note ||
+              fields.notes.some(
+                (field) => typeof (note as any)[field] !== "string",
+              ) ||
+              !note.id ||
+              note.projectId !== id ||
+              (note.pinned !== undefined && typeof note.pinned !== "boolean") ||
+              (note.color !== undefined &&
+                !["yellow", "mint", "pink", "violet"].includes(note.color)),
+          ) ||
+          new Set(s.stickyNotes.map((note) => note.id)).size !==
+            s.stickyNotes.length
+        )
+          throw Error("Invalid stage sticky notes");
+      }
     }
     workflows[id] = workflow as Record<string, Stage>;
   }

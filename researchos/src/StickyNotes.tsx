@@ -5,6 +5,8 @@ type Props = {
   notes: Note[];
   projects: Project[];
   projectId?: string;
+  projectLocked?: boolean;
+  label?: string;
   onCreate: (note: Note) => void;
   onChange: (id: string, changes: Partial<Note>) => void;
   onDelete: (id: string) => void;
@@ -13,6 +15,8 @@ export default function StickyNotes({
   notes,
   projects,
   projectId,
+  projectLocked = false,
+  label = "Sticky notes",
   onCreate,
   onChange,
   onDelete,
@@ -29,7 +33,7 @@ export default function StickyNotes({
       pinned: false,
     });
   return (
-    <section className="sticky-board" aria-label="Sticky notes">
+    <section className="sticky-board" aria-label={label}>
       <div className="sticky-toolbar">
         <span>Click a note and start writing. Changes save automatically.</span>
         <button className="primary" onClick={add} disabled={!projects.length}>
@@ -47,19 +51,26 @@ export default function StickyNotes({
               className={`sticky-note sticky-${note.color || "yellow"}`}
             >
               <div className="sticky-controls">
-                <select
-                  aria-label="Note project"
-                  value={note.projectId}
-                  onChange={(e) =>
-                    onChange(note.id, { projectId: e.target.value })
-                  }
-                >
-                  {projects.map((p) => (
-                    <option value={p.id} key={p.id}>
-                      {p.short}
-                    </option>
-                  ))}
-                </select>
+                {projectLocked ? (
+                  <span className="sticky-project">
+                    {projects.find((p) => p.id === note.projectId)?.short ||
+                      "This project"}
+                  </span>
+                ) : (
+                  <select
+                    aria-label="Note project"
+                    value={note.projectId}
+                    onChange={(e) =>
+                      onChange(note.id, { projectId: e.target.value })
+                    }
+                  >
+                    {projects.map((p) => (
+                      <option value={p.id} key={p.id}>
+                        {p.short}
+                      </option>
+                    ))}
+                  </select>
+                )}
                 <button
                   aria-label={note.pinned ? "Unpin note" : "Pin note"}
                   aria-pressed={Boolean(note.pinned)}
