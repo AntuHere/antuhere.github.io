@@ -28,7 +28,7 @@ test("portfolio navigation and direct Pages paths work on desktop and phone", as
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(
-    page.getByText("Hi all, I'm Antu", { exact: false }),
+    page.getByRole("heading", {name: /Nasfiqul Islam Antu/}).first(),
   ).toBeVisible();
   if (await page.locator(".menu-icon").isVisible())
     await page.locator(".menu-icon").click();

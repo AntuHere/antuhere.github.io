@@ -1,52 +1,24 @@
-import React, {useState, useEffect, lazy, Suspense} from "react";
-import {openSource} from "../../portfolio";
-import Contact from "../contact/Contact";
+import React, {lazy, Suspense} from "react";
+import {contactInfo, greeting} from "../../portfolio";
 import Loading from "../loading/Loading";
 
-const renderLoader = () => <Loading />;
 const GithubProfileCard = lazy(() =>
   import("../../components/githubProfileCard/GithubProfileCard")
 );
-export default function Profile() {
-  const [prof, setrepo] = useState([]);
-  function setProfileFunction(array) {
-    setrepo(array);
-  }
 
-  useEffect(() => {
-    if (openSource.showGithubProfile === "true") {
-      const getProfileData = () => {
-        fetch("/profile.json")
-          .then(result => {
-            if (result.ok) {
-              return result.json();
-            }
-          })
-          .then(response => {
-            setProfileFunction(response.data.user);
-          })
-          .catch(function (error) {
-            console.error(
-              `${error} (because of this error GitHub contact section could not be displayed. Contact section has reverted to default)`
-            );
-            setProfileFunction("Error");
-            openSource.showGithubProfile = "false";
-          });
-      };
-      getProfileData();
-    }
-  }, []);
-  if (
-    openSource.display &&
-    openSource.showGithubProfile === "true" &&
-    !(typeof prof === "string" || prof instanceof String)
-  ) {
-    return (
-      <Suspense fallback={renderLoader()}>
-        <GithubProfileCard prof={prof} key={prof.id} />
-      </Suspense>
-    );
-  } else {
-    return <Contact />;
-  }
+export default function Profile() {
+  if (!contactInfo.display) return null;
+  // Preserve the existing profile/contact layout, using current CV information
+  // rather than an older GitHub bio and a remotely hosted avatar.
+  const profile = {
+    name: greeting.name,
+    bio: greeting.role,
+    avatarUrl: greeting.photo,
+    location: contactInfo.location
+  };
+  return (
+    <Suspense fallback={<Loading />}>
+      <GithubProfileCard prof={profile} />
+    </Suspense>
+  );
 }

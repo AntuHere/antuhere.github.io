@@ -10,6 +10,7 @@ export default function socialMedia() {
     <div className="social-media-div">
       {socialMediaLinks.github ? (
         <a
+          aria-label="GitHub"
           href={socialMediaLinks.github}
           className="icon-button github"
           target="_blank"
@@ -22,6 +23,7 @@ export default function socialMedia() {
 
       {socialMediaLinks.linkedin ? (
         <a
+          aria-label="LinkedIn"
           href={socialMediaLinks.linkedin}
           className="icon-button linkedin"
           target="_blank"
@@ -34,12 +36,20 @@ export default function socialMedia() {
 
       {socialMediaLinks.gmail ? (
         <a
+          aria-label="Email"
           href={`mailto:${socialMediaLinks.gmail}`}
           className="icon-button google"
           target="_blank"
           rel="noopener noreferrer"
         >
           <i className="fas fa-envelope"></i>
+          <span></span>
+        </a>
+      ) : null}
+
+      {socialMediaLinks.scholar ? (
+        <a href={socialMediaLinks.scholar} className="icon-button github" aria-label="Google Scholar" target="_blank" rel="noopener noreferrer">
+          <i className="fas fa-graduation-cap"></i>
           <span></span>
         </a>
       ) : null}

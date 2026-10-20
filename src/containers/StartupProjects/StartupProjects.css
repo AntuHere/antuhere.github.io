@@ -114,3 +114,11 @@ For greater control over colors visit each components .scss file. */
   }
 }
 /*# sourceMappingURL=StartupProjects.css.map */
+/* Academic descriptions are longer; retain the original card appearance. */
+.research-activities { text-align: left; padding-left: 20px; }
+.research-activities li { margin-bottom: 10px; }
+.research-technologies .project-tag { cursor: default; }
+.card-title { overflow-wrap: anywhere; }
+@media (max-width: 360px) {
+  .projects-container { grid-template-columns: minmax(0, 1fr); }
+}

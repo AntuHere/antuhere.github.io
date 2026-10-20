@@ -6,15 +6,10 @@ import emoji from "react-easy-emoji";
 import {Fade} from "react-reveal";
 
 export default function GithubProfileCard({prof}) {
-  if (prof.isHireable) {
-    prof.hireable = "Yes";
-  } else {
-    prof.hireable = "No";
-  }
   return (
     <Fade bottom duration={1000} distance="20px">
       <div className="main" id="contact">
-        <h1 className="prof-title">Reach Out to me!</h1>
+        <h1 className="prof-title">{contactInfo.title}</h1>
         <div className="row">
           <div className="main-content-profile">
             <div className="blog-header">
@@ -23,7 +18,7 @@ export default function GithubProfileCard({prof}) {
 
             <div className="">
               <a className="contact-detail" href={"tel:" + contactInfo.number}>
-              <i class="fas fa-phone"></i>
+              <i className="fas fa-phone"></i>
                 {contactInfo.number}
               </a>
               <br />
@@ -32,7 +27,7 @@ export default function GithubProfileCard({prof}) {
                 className="contact-detail-email"
                 href={"mailto:" + contactInfo.email_address}
               >
-                <i class="fas fa-envelope"></i>
+                <i className="fas fa-envelope"></i>
                 {contactInfo.email_address}
               </a>
             </div>

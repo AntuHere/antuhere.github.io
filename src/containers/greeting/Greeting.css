@@ -173,3 +173,10 @@ For greater control over colors visit each components .scss file. */
   }
 }
 /*# sourceMappingURL=Greeting.css.map */
+/* Fit the academic name and the additional CV action in the existing layout. */
+.greeting-text-div { min-width: 0; }
+.button-greeting-div { flex-wrap: wrap; column-gap: 18px; }
+.button-greeting-div .main-button { margin-right: 0; }
+@media (max-width: 768px) {
+  .greeting-image-div { height: auto; min-height: 256px; }
+}

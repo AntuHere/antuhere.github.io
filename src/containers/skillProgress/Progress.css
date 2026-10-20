@@ -84,3 +84,11 @@ For greater control over colors visit each components .scss file. */
   }
 }
 /*# sourceMappingURL=Progress.css.map */
+/* Keep the existing rounded accent bands; levels are descriptive, not scores. */
+.meter.skill-level { height: auto; }
+.meter.skill-level > span {
+  padding: 6px 14px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.skill .skill-tools { font-size: 17px; line-height: 1.6; margin-bottom: 28px; }

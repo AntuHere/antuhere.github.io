@@ -65,6 +65,20 @@ export default function StartupProject() {
                     >
                       {project.projectDesc}
                     </p>
+                    <p className={isDark ? "dark-mode card-subtitle" : "card-subtitle"}>
+                      <strong>{project.status}</strong> · {project.category}
+                    </p>
+                    {project.activities && (
+                      <ul className={isDark ? "dark-mode card-subtitle research-activities" : "card-subtitle research-activities"}>
+                        {project.activities.map(activity => <li key={activity}>{activity}</li>)}
+                      </ul>
+                    )}
+                    {project.progressText && <p className={isDark ? "dark-mode card-subtitle" : "card-subtitle"}><strong>Progress: </strong>{project.progressText}</p>}
+                    {project.technologies && (
+                      <div className="project-card-footer research-technologies">
+                        {project.technologies.map(technology => <span key={technology} className={isDark ? "dark-mode project-tag" : "project-tag"}>{technology}</span>)}
+                      </div>
+                    )}
                     {project.footerLink ? (
                       <div className="project-card-footer">
                         {project.footerLink.map((link, i) => {

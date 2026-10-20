@@ -10,9 +10,9 @@ export default function Footer() {
     <Fade bottom duration={1000} distance="5px">
       <div className="footer-div">
         <p className={isDark ? "dark-mode footer-text" : "footer-text"}>
-        {emoji("Copyright © 2022 All rights reserved by ")}
+        {emoji("Copyright © 2026 All rights reserved by ")}
         <a href="https://github.com/antuhere">
-            AntuHere
+            Nasfiqul Islam Antu
           </a>
         </p>
        

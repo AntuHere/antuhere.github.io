@@ -35,3 +35,26 @@
   }
 }
 /*# sourceMappingURL=Project.css.map */
+/* Let full academic citations wrap within the existing repository cards. */
+.publication-card .publication-title {
+  white-space: normal;
+  height: auto;
+  overflow: visible;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.publication-card .publication-title a { color: inherit; text-decoration: none; }
+.publication-card .publication-title a:hover { text-decoration: underline; }
+.publication-card .publication-details {
+  display: block;
+  overflow: visible;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.publication-card .publication-details a { color: inherit; }
+.publication-card .repo-name-div { align-items: flex-start; }
+.publication-card .repo-svg { margin-top: 6px; }
+@media (max-width: 768px) {
+  .repo-cards-div-main { grid-template-columns: minmax(0, 1fr); }
+  .publication-card .publication-title { font-size: 22px; }
+}

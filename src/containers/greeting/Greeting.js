@@ -1,11 +1,10 @@
-import React, {useContext,useEffect,useState} from "react";
+import React, {useContext} from "react";
 import {Fade} from "react-reveal";
-import emoji from "react-easy-emoji";
 import "./Greeting.css";
 import SocialMedia from "../../components/socialMedia/SocialMedia";
 import Button from "../../components/button/Button";
 
-import {illustration, greeting, openSource} from "../../portfolio";
+import {illustration, greeting} from "../../portfolio";
 import StyleContext from "../../contexts/StyleContext";
 
 export default function Greeting() {
@@ -14,36 +13,6 @@ export default function Greeting() {
     return null;
   }
 
-  const [prof, setrepo] = useState([]);
-  function setProfileFunction(array) {
-    setrepo(array);
-  }
-
-  useEffect(() => {
-    if (openSource.showGithubProfile === "true") {
-      const getProfileData = () => {
-        fetch("/profile.json")
-          .then(result => {
-            if (result.ok) {
-              return result.json();
-            }
-            console.error(result);
-          })
-          .then(response => {
-            setProfileFunction(response.data.user);
-          })
-          .catch(function (error) {
-            setProfileFunction("Error");
-            console.log(
-              "Because of this error, contact section has reverted to default"
-            );
-            console.error(error);
-            openSource.showGithubProfile = "false";
-          });
-      };
-      getProfileData();
-    }
-  }, []);
   return (
     <Fade bottom duration={1000} distance="40px">
       <div className="greet-main" id="greeting">
@@ -55,7 +24,7 @@ export default function Greeting() {
               >
                 {" "}
                 {greeting.title}{" "}
-                <span className="wave-emoji">{emoji("👋")}</span>
+                <span className="wave-emoji" role="img" aria-label="Waving hand">👋</span>
               </h1>
               <p
                 className={
@@ -73,7 +42,8 @@ export default function Greeting() {
               </p>
               <SocialMedia />
               <div className="button-greeting-div">
-                <Button text="Contact me" href="#contact" />
+                <Button text="Explore My Research" href="#projects" />
+                <Button text="Download CV" href={greeting.cv} download="Md_Nasfiqul_Islam_Antu_CV.pdf" />
                 
               </div>
             </div>
@@ -84,8 +54,8 @@ export default function Greeting() {
                 <div className="row">
                   <div className="image-content-profile">
                     <img
-                      src={prof.avatarUrl}
-                      alt={prof.name}
+                      src={greeting.photo}
+                      alt="Nasfiqul Islam Antu — professional portrait"
                       className="profile-image"
                     />
                   </div>

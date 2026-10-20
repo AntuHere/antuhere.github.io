@@ -17,20 +17,18 @@ export default function EducationCard({school}) {
   };
   const {isDark} = useContext(StyleContext);
 
-  if (!school.logo)
-    console.error(`Image of ${school.name} is missing in education section`);
   return (
     <div>
       <Fade left duration={1000}>
         <div className="education-card">
           <div className="education-card-left">
-            <img
+            {school.logo ? <img
               crossOrigin={"anonymous"}
               ref={imgRef}
               className="education-roundedimg"
               src={school.logo}
               alt={school.schoolName}
-            />
+            /> : <span className="education-roundedimg education-initials" aria-label={school.schoolName}>{school.initials}</span>}
           </div>
           <div className="education-card-right">
             <h5 className="education-text-school">{school.schoolName}</h5>

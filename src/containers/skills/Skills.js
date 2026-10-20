@@ -59,6 +59,10 @@ export default function Skills() {
                   </p>
                 );
               })}
+              <p className={isDark ? "dark-mode subTitle skills-text" : "subTitle skills-text"}>
+                <strong>Research interests: </strong>
+                {skillsSection.interests.join(" · ")}
+              </p>
             </div>
           </div>
         </Fade>
