@@ -25,7 +25,7 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "predeploy": "node scripts/prepare-pages.cjs && npm run build",
+    "predeploy": "npm run check:media && node scripts/prepare-pages.cjs && npm run build",
     "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "npm run build:portfolio && npm run build:researchos",
@@ -35,7 +35,8 @@
     "build:researchos": "npm --prefix researchos run build",
     "prestart": "npm --prefix researchos run build -- --outDir ../public/researchos --emptyOutDir",
     "start:researchos": "npm --prefix researchos run dev",
-    "test:researchos": "npm --prefix researchos run test:e2e --"
+    "test:researchos": "npm --prefix researchos run test:e2e --",
+    "check:media": "node scripts/check-portfolio-media.cjs"
   },
   "eslintConfig": {
     "extends": [

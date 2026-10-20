@@ -1,4 +1,6 @@
 import splashAnimation from "./assets/lottie/splashAnimation";
+import {researchProjects} from "./data/researchProjects";
+import portfolioMedia from "./data/portfolioMedia.json";
 
 const splashScreen = {
   enabled: true,
@@ -35,7 +37,7 @@ const skillsSection = {
   skills: [
     "I am a final-year Civil and Environmental Engineering undergraduate at the Islamic University of Technology (IUT), Bangladesh, with a strong interest in transportation and traffic engineering.",
     "I have co-authored seven peer-reviewed journal articles on climate change, food systems and the environment. My contributions include field data collection, data analysis and literature review.",
-    "I am currently working on three independent research projects involving computer vision-based traffic analysis and statistical analysis of environmental survey data. I am seeking a research assistant role to strengthen my skills in data-driven transportation research, machine learning and academic writing."
+    "I am currently working on five ongoing research projects involving computer vision-based traffic analysis and statistical analysis of environmental survey data. I am seeking a research assistant role to strengthen my skills in data-driven transportation research, machine learning and academic writing."
   ],
   interests: [
     "Transportation & Traffic Engineering",
@@ -64,6 +66,9 @@ const educationInfo = {
     {
       schoolName: "Islamic University of Technology (IUT)",
       initials: "IUT",
+      logo: portfolioMedia.iutLogo.src,
+      logoAlt: portfolioMedia.iutLogo.alt,
+      logoFit: "contain",
       subHeader: "B.Sc. in Civil and Environmental Engineering",
       duration: "Expected graduation: October 2027",
       desc: "Fourth Year, Seventh Semester · Gazipur, Bangladesh",
@@ -137,49 +142,18 @@ const openSource = {showGithubProfile: "false", display: true};
 
 const bigProjects = {
   title: "Research Projects",
-  subtitle: "THREE ONGOING STUDIES IN TRANSPORTATION AND ENVIRONMENTAL ENGINEERING",
-  projects: [
-    {
-      projectName: "Rickshaw Passenger Pickup/Drop-off and Stopping-Duration Analysis",
-      category: "Transportation Engineering | Computer Vision",
-      status: "Ongoing",
-      projectDesc: "Investigating rickshaw passenger pickup/drop-off events and stopping durations in Dhaka's heterogeneous traffic environment using video-based computer vision techniques.",
-      activities: [
-        "Prepared and annotated roadside video data from Mirpur, ECB Chattar and Dhanmondi using Roboflow.",
-        "Developing and fine-tuning a YOLO-based model for rickshaw detection, passenger pickup/drop-off events and stopping-duration analysis.",
-        "Literature review on non-motorised vehicle stopping behaviour and curbside activity."
-      ],
-      technologies: ["Python", "YOLO", "OpenCV", "Roboflow"],
-      progressText: "Data collection completed; model fine-tuning and analysis in progress."
-    },
-    {
-      projectName: "Lateral Movement of Vehicles in Mixed Traffic",
-      category: "Transportation Engineering | Traffic Behaviour",
-      status: "Ongoing",
-      projectDesc: "Studying the lateral movement and interaction of vehicles in non-lane-based, heterogeneous traffic using computer vision and traffic trajectory analysis.",
-      activities: [
-        "Developing a YOLO-based vehicle detection and tracking workflow to investigate lateral movement.",
-        "Literature review on lateral behaviour and lane discipline in mixed traffic streams.",
-        "Research methodology and model development ongoing; video data collection at Bangla Motor Intersection, Dhaka, is scheduled."
-      ],
-      technologies: ["Python", "YOLO", "OpenCV", "Vehicle Tracking"],
-      progressText: "Research methodology and model development ongoing; the final research question remains under development."
-    },
-    {
-      projectName: "Road Construction and Demolition Waste: Soil Pollution and Environmental Impacts",
-      category: "Environmental Engineering | Statistical Analysis",
-      status: "Ongoing",
-      projectDesc: "Investigating the environmental and soil-related impacts of road construction and demolition waste through questionnaire surveys and quantitative statistical analysis in Sirajganj, Bangladesh.",
-      activities: [
-        "Questionnaire-based survey research on soil pollution and environmental impacts.",
-        "Responsible for the literature review and statistical analysis of the survey data.",
-        "Interpretation of survey findings and quantitative environmental impact analysis."
-      ],
-      technologies: ["Excel", "R", "Python", "Statistical Analysis"],
-      progressText: "Data collection completed; analysis ongoing."
-    }
-  ],
+  subtitle: "5 Ongoing Research Projects",
+  projects: researchProjects,
   display: true
+};
+
+const volunteering = {
+  title: "Volunteering & Leadership",
+  organization: "BB Mobile School",
+  role: "Co-founder & Volunteer",
+  description: "Co-founder and volunteer at BB Mobile School, a community-focused initiative. Contributed to volunteer activities, team coordination, and community engagement.",
+  url: "https://www.facebook.com/BB.MobileSchool",
+  photos: [portfolioMedia.volunteerGroup, portfolioMedia.volunteerBanner]
 };
 
 const contactInfo = {
@@ -193,5 +167,5 @@ const contactInfo = {
 
 export {
   illustration, greeting, socialMediaLinks, splashScreen, skillsSection,
-  educationInfo, techStack, workExperiences, openSource, bigProjects, contactInfo
+  educationInfo, techStack, workExperiences, openSource, bigProjects, contactInfo, volunteering
 };

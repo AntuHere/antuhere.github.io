@@ -1,10 +1,9 @@
 import React, {useContext} from "react";
 import "./Skills.css";
 import SoftwareSkill from "../../components/softwareSkills/SoftwareSkill";
-import {illustration, skillsSection} from "../../portfolio";
+import {skillsSection} from "../../portfolio";
 import {Fade} from "react-reveal";
-import coding from "../../assets/lottie/coding.json";
-import DisplayLottie from "../../components/displayLottie/DisplayLottie";
+import portfolioMedia from "../../data/portfolioMedia.json";
 import StyleContext from "../../contexts/StyleContext";
 
 export default function Skills() {
@@ -17,14 +16,15 @@ export default function Skills() {
       <div className="skills-main-div">
         <Fade left duration={1000}>
           <div className="skills-image-div">
-            {illustration.animated ? (
-              <DisplayLottie animationData={coding} />
-            ) : (
-              <img
-                alt="Man Working"
-                src={require("../../assets/images/developerActivity.svg")}
-              ></img>
-            )}
+            <img
+              className="research-illustration"
+              src={portfolioMedia.researchIllustration.src}
+              alt={portfolioMedia.researchIllustration.alt}
+              width="659"
+              height="646"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         </Fade>
         <Fade right duration={1000}>

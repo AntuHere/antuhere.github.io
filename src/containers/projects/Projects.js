@@ -15,7 +15,7 @@ export default function Projects() {
   return (
     <div className="main" id="publications">
       <h1 className="project-title">Publications</h1>
-      <p className="subTitle">Seven peer-reviewed journal articles. My contributions: field data collection, data analysis and, in several papers, literature review.</p>
+      <p className="subTitle">7 Peer-Reviewed Publications · Contributions include field data collection, data analysis and literature review.</p>
       <div className="repo-cards-div-main">
         {publications.map(publication => (
           <Fade key={publication.doi} bottom duration={1000} distance="20px">
@@ -26,10 +26,9 @@ export default function Projects() {
                   <a href={publication.url} target="_blank" rel="noopener noreferrer">{publication.title}</a>
                 </h2>
               </div>
-              <p className="repo-description publication-details">{publication.authors} ({publication.year}).</p>
-              <p className="publication-details"><em>{publication.journal}</em>, {publication.volume}, {publication.pages}.</p>
-              <p className="publication-details"><a href={publication.url} target="_blank" rel="noopener noreferrer">DOI: {publication.doi}</a></p>
-              {publication.archiveUrl && <p className="publication-details"><a href={publication.archiveUrl} target="_blank" rel="noopener noreferrer">Also available on HAL</a></p>}
+              <p className="publication-authors">{publication.authors}</p>
+              <time className="publication-year" dateTime={String(publication.year)}>{publication.year}</time>
+              <a className="main-button publication-read" href={publication.url} target="_blank" rel="noopener noreferrer">Read Publication</a>
             </article>
           </Fade>
         ))}

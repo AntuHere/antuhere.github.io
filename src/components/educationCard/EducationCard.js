@@ -25,9 +25,9 @@ export default function EducationCard({school}) {
             {school.logo ? <img
               crossOrigin={"anonymous"}
               ref={imgRef}
-              className="education-roundedimg"
+              className={school.logoFit === "contain" ? "education-roundedimg education-logo-contain" : "education-roundedimg"}
               src={school.logo}
-              alt={school.schoolName}
+              alt={school.logoAlt || school.schoolName}
             /> : <span className="education-roundedimg education-initials" aria-label={school.schoolName}>{school.initials}</span>}
           </div>
           <div className="education-card-right">

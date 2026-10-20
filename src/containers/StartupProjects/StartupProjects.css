@@ -122,3 +122,15 @@ For greater control over colors visit each components .scss file. */
 @media (max-width: 360px) {
   .projects-container { grid-template-columns: minmax(0, 1fr); }
 }
+
+#projects .project-card { justify-content: flex-start; min-width: 0; }
+.research-project-image { margin-bottom: 10px; }
+.research-project-image img, .research-project-image .portfolio-image-pending { width: 100%; aspect-ratio: 16 / 9; height: auto; object-fit: cover; }
+.research-details { text-align: left; font-size: 16px; line-height: 1.6; margin: 18px 0; }
+.research-details summary { cursor: pointer; font-weight: 700; }
+.research-details summary:focus-visible { outline: 2px solid #6c63ff; outline-offset: 4px; }
+.research-details h3 { font-size: 17px; }
+.research-methods-label { font-size: 14px; }
+.research-project-link { color: inherit; }
+.research-status { line-height: 1.6; }
+.project-card-footer.research-technologies .project-tag { height: auto; min-height: 2em; white-space: normal; }

@@ -153,3 +153,5 @@ For greater control over colors visit each components .scss file. */
   font-weight: 700;
   color: #55198b;
 }
+
+.education-logo-contain { object-fit: contain; border-radius: 0; box-shadow: none; }

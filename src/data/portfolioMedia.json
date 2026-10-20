@@ -1,0 +1,47 @@
+{
+  "researchIllustration": {
+    "src": "/images/transportation-research.png",
+    "filename": "transportation-research.png",
+    "alt": "Engineering researcher reviewing traffic video with vehicle detection boxes, trajectories, papers and charts"
+  },
+  "iutLogo": {
+    "src": null,
+    "filename": "iut-logo.png",
+    "alt": "Official Islamic University of Technology (IUT) emblem"
+  },
+  "rickshaw": {
+    "src": null,
+    "filename": "rickshaw-stopping.webp",
+    "alt": "Rickshaw passenger boarding or alighting beside a road in Dhaka"
+  },
+  "lateral": {
+    "src": null,
+    "filename": "mixed-traffic.webp",
+    "alt": "Elevated view of rickshaws, cars, motorcycles and buses in heterogeneous urban traffic"
+  },
+  "waste": {
+    "src": null,
+    "filename": "road-construction-waste.webp",
+    "alt": "Broken concrete, bricks and road construction debris beside a roadway"
+  },
+  "emergency": {
+    "src": null,
+    "filename": "emergency-access.webp",
+    "alt": "Ambulance navigating congested mixed urban traffic"
+  },
+  "curbside": {
+    "src": null,
+    "filename": "curbside-occupancy.webp",
+    "alt": "Roadside rickshaw occupancy and informal passenger-serving activity in Dhaka"
+  },
+  "volunteerGroup": {
+    "src": null,
+    "filename": "bb-mobile-school-volunteers.webp",
+    "alt": "BB Mobile School volunteers together at a community location"
+  },
+  "volunteerBanner": {
+    "src": null,
+    "filename": "bb-mobile-school-banner.webp",
+    "alt": "BB Mobile School Find Educate Build team banner"
+  }
+}

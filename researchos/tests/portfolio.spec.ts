@@ -15,7 +15,7 @@ test.beforeEach(async ({page}) => {
   await page.route('**/*', route => route.request().url().startsWith('http://127.0.0.1:4173/') ? route.continue() : route.abort());
 });
 
-test('academic identity, seven full citations, three ongoing studies, and education match the CV', async ({page}) => {
+test('academic identity, seven compact publication cards, five ongoing studies, and education match the supplied content', async ({page}) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
@@ -27,13 +27,18 @@ test('academic identity, seven full citations, three ongoing studies, and educat
   expect(await portrait.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
   await expect(page.locator('#publications article')).toHaveCount(7);
   for (const doi of dois) {
-    const link = page.locator('#publications').getByRole('link', {name: 'DOI: ' + doi, exact: true});
+    const card = page.locator('#publications article').filter({has: page.locator('a.publication-read[href$="' + doi + '"]')});
+    const link = card.getByRole('link', {name: 'Read Publication', exact: true});
     await expect(link).toHaveAttribute('href', new RegExp(doi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'));
-    await expect(link.locator('xpath=ancestor::article')).toContainText(/Islam, M\. A\./);
+    await expect(card).toContainText('Islam, M. A.');
   }
-  await expect(page.locator('#projects .project-card')).toHaveCount(3);
-  await expect(page.locator('#projects .project-card strong').filter({hasText: /^Ongoing$/})).toHaveCount(3);
-  await expect(page.locator('#projects')).toContainText('video data collection at Bangla Motor Intersection, Dhaka, is scheduled');
+  await expect(page.locator('#projects .project-card')).toHaveCount(5);
+  await expect(page.locator('#projects .research-status')).toHaveCount(5);
+  await expect(page.locator('#projects')).toContainText('5 Ongoing Research Projects');
+  await expect(page.locator('#projects')).toContainText('Ongoing — Concept Development');
+  await expect(page.locator('#projects')).toContainText('Ongoing — Exploratory Field Research');
+  await expect(page.locator('#publications')).not.toContainText('DOI:');
+  await expect(page.locator('#publications')).not.toContainText('European Journal');
   await expect(page.locator('#education')).toContainText('Islamic University of Technology (IUT)');
   await expect(page.locator('#education')).toContainText('Expected graduation: October 2027');
   await expect(page.locator('#education')).toContainText('Fourth Year, Seventh Semester');
@@ -70,15 +75,15 @@ test('academic links, PDF download, existing themes, section layout and Research
   await expect(page.locator('.publication-card').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await page.getByRole('link', {name: 'Publications', exact: true}).click();
   await expect(page).toHaveURL(/#publications$/);
-  for (const section of ['greeting', 'skills', 'education', 'publications', 'projects', 'contact']) {
+  for (const section of ['greeting', 'skills', 'education', 'publications', 'projects', 'volunteering', 'contact']) {
     await page.locator('#' + section).scrollIntoViewIfNeeded();
     await page.waitForTimeout(1100);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   }
   await expect(page.locator('#contact')).toContainText("Let's Connect");
   await expect(page.locator('#contact')).toContainText('nasfiqul.antu@gmail.com');
-  const sectionOrder = await page.locator('#greeting, #skills, #education, #publications, #projects, #contact').evaluateAll(elements => elements.map(element => element.id));
-  expect(sectionOrder).toEqual(['greeting', 'skills', 'education', 'publications', 'projects', 'contact']);
+  const sectionOrder = await page.locator('#greeting, #skills, #education, #publications, #projects, #volunteering, #contact').evaluateAll(elements => elements.map(element => element.id));
+  expect(sectionOrder).toEqual(['greeting', 'skills', 'education', 'publications', 'projects', 'volunteering', 'contact']);
   await page.locator('#greeting').scrollIntoViewIfNeeded();
   await page.screenshot({path: testInfo.outputPath('academic-portfolio.png')});
   // The original wave/reveal animations and original purple buttons remain.

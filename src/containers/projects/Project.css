@@ -35,26 +35,50 @@
   }
 }
 /*# sourceMappingURL=Project.css.map */
-/* Let full academic citations wrap within the existing repository cards. */
-.publication-card .publication-title {
+/* Compact citations using the existing card palette and hover treatment. */
+#publications .repo-cards-div-main { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#publications .publication-card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  min-width: 0;
+  padding: 1.4rem;
+  cursor: default;
+}
+#publications .publication-title {
   white-space: normal;
   height: auto;
   overflow: visible;
-  line-height: 1.35;
+  font-size: 20px;
+  line-height: 1.4;
   overflow-wrap: anywhere;
 }
-.publication-card .publication-title a { color: inherit; text-decoration: none; }
-.publication-card .publication-title a:hover { text-decoration: underline; }
-.publication-card .publication-details {
-  display: block;
-  overflow: visible;
+#publications .publication-title a { color: inherit; text-decoration: none; }
+#publications .publication-title a:hover { text-decoration: underline; }
+#publications .dark-card-mode .publication-title { color: #ffffff; }
+#publications .publication-authors {
+  font-size: 14px;
   line-height: 1.6;
+  margin: 12px 0 6px;
   overflow-wrap: anywhere;
 }
-.publication-card .publication-details a { color: inherit; }
-.publication-card .repo-name-div { align-items: flex-start; }
-.publication-card .repo-svg { margin-top: 6px; }
-@media (max-width: 768px) {
-  .repo-cards-div-main { grid-template-columns: minmax(0, 1fr); }
-  .publication-card .publication-title { font-size: 22px; }
+#publications .dark-card-mode .publication-authors { color: #d9dbdf; }
+#publications .publication-year { font-size: 13px; line-height: 1.5; margin-bottom: 14px; }
+#publications .dark-card-mode .publication-year { color: #d9dbdf; }
+#publications .publication-read {
+  align-self: flex-start;
+  margin: auto 0 0;
+  padding: 9px 12px;
+  font-size: 13px;
+  text-transform: none;
+}
+#publications .repo-name-div { align-items: flex-start; }
+#publications .repo-svg { margin-top: 4px; }
+@media (max-width: 1100px) {
+  #publications .repo-cards-div-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  #publications .repo-cards-div-main { grid-template-columns: minmax(0, 1fr); }
+  #publications .publication-title { font-size: 19px; }
 }

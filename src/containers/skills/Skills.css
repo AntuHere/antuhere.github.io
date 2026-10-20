@@ -75,3 +75,6 @@ For greater control over colors visit each components .scss file. */
   }
 }
 /*# sourceMappingURL=Skills.css.map */
+.research-illustration { width: 100%; aspect-ratio: 659 / 646; object-fit: contain; animation: research-float 6s ease-in-out infinite; }
+@keyframes research-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@media (prefers-reduced-motion: reduce) { .research-illustration { animation: none; } }
