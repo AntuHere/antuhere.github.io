@@ -56,6 +56,9 @@ function Header() {
           <li>
             <a href="#contact">Contact Me</a>
           </li>
+          <li>
+            <a href="/researchos/">ResearchOS</a>
+          </li>
           
           <li>
           </li>

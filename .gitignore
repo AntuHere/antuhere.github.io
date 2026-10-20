@@ -24,3 +24,9 @@ yarn-error.log*
 
 #user generated content
 public/profile.json
+
+# ResearchOS dependencies and generated development preview
+/researchos/node_modules/
+/public/researchos/
+/researchos/test-results/
+/researchos/playwright-report/
