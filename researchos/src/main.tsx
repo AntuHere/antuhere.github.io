@@ -1,3 +1,8 @@
+import GoogleGate, { useGoogle } from "./GoogleGate";
+import StickyNotes from "./StickyNotes";
+import LiteratureSheet from "./LiteratureSheet";
+import AIAssistant from "./AIAssistant";
+import { stageFile, syncFile } from "./vault";
 import ResearchWorkspace from "./ResearchWorkspace";
 import {
   parseBackup,
@@ -6,7 +11,7 @@ import {
   safeUrl,
 } from "./storage";
 import { useModalFocus } from "./useModalFocus";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   LayoutDashboard,
@@ -26,8 +31,6 @@ import {
   Clock3,
   CheckCircle2,
   Circle,
-  MoreHorizontal,
-  PanelLeftClose,
   Menu,
   X,
   FlaskConical,
@@ -39,11 +42,9 @@ import {
   ShieldCheck,
   AlertCircle,
   FileText,
-  Link2,
   Target,
   ArrowRight,
   Filter,
-  Copy,
   Sun,
   Moon,
   LockKeyhole,
@@ -76,7 +77,8 @@ type View =
   | "assets"
   | "notes"
   | "team"
-  | "settings";
+  | "settings"
+  | "assistant";
 type Modal = "project" | "task" | "paper" | "asset" | "note" | "member" | null;
 const menu: [View, string, any][] = [
   ["overview", "Overview", LayoutDashboard],
@@ -85,6 +87,7 @@ const menu: [View, string, any][] = [
   ["literature", "Literature library", BookOpen],
   ["assets", "Assets & data", Database],
   ["notes", "Research notes", NotebookPen],
+  ["assistant", "AI assistant", FlaskConical],
 ];
 const fmt = (date: string) =>
   date
@@ -95,6 +98,9 @@ const fmt = (date: string) =>
     : "No deadline";
 const nl = (n: number) => String(n).padStart(2, "0");
 function App() {
+  const { drive, email, signOut } = useGoogle();
+  const [proposal, setProposal] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
   const [db, setDb] = useState<Store>(loadStore);
   const [view, setView] = useState<View>("overview");
   const [project, setProject] = useState("all");
@@ -152,7 +158,16 @@ function App() {
       matches(t.title, projectName(t.projectId), t.priority),
   );
   const shownPapers = db.papers.filter(
-    (x) => filtered(x.projectId) && matches(x.title, x.authors, x.notes),
+    (x) =>
+      filtered(x.projectId) &&
+      matches(
+        x.title,
+        x.authors,
+        x.notes,
+        x.abstractSummary || "",
+        x.gap || "",
+        x.doi,
+      ),
   );
   const shownAssets = db.assets.filter(
     (x) => filtered(x.projectId) && matches(x.name, x.kind),
@@ -193,11 +208,14 @@ function App() {
     initial: Record<string, string> = {},
     id: string | null = null,
   ) => {
+    setProposal(null);
     setEditing(id);
     setForm(initial);
     setModal(m);
   };
-  const save = () => {
+  const [driveError, setDriveError] = useState("");
+  const save = async () => {
+    if (saving) return;
     const name = (form.title || form.name || "").trim();
     if (!name && modal !== "member") {
       notify("Please enter a title or name");
@@ -220,7 +238,33 @@ function App() {
         visibility: form.visibility === "Shared" ? "Shared" : "Private",
         goal: form.goal || "",
       };
+      setSaving(true);
+      let attachment;
+      try {
+        if (proposal)
+          attachment = await stageFile(x, "Research Proposal", proposal);
+      } catch (e) {
+        setSaving(false);
+        notify((e as Error).message);
+        return;
+      }
       editing ? patch("projects", editing, x) : mutate("projects", x);
+      setSaving(true);
+      setDriveError("");
+      setModal(null);
+      try {
+        await drive.ensureProject(x);
+        if (attachment) await syncFile(drive, x, attachment);
+        notify("Project folder ready in Drive");
+      } catch (e) {
+        setDriveError(
+          "Project saved in this browser. Drive setup/upload needs retry in its Documents vault: " +
+            (e as Error).message,
+        );
+      } finally {
+        setSaving(false);
+      }
+      return;
     } else if (modal === "task") {
       const x: Task = {
         id: editing || uid(),
@@ -242,6 +286,11 @@ function App() {
         doi: form.doi || "",
         status: (form.status || "To read") as Paper["status"],
         notes: form.notes || "",
+        abstractSummary: form.abstractSummary || "",
+        gap: form.gap || "",
+        methods: form.methods || "",
+        findings: form.findings || "",
+        relevance: form.relevance || "",
         url: form.url || "",
       };
       editing ? patch("papers", editing, x) : mutate("papers", x);
@@ -496,6 +545,7 @@ function App() {
                     notes: "Research notes",
                     team: "Collaboration",
                     settings: "Settings",
+                    assistant: "AI assistant",
                   } as any
                 )[view]}
             </strong>
@@ -519,10 +569,17 @@ function App() {
             >
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <div className="top-avatar">AH</div>
+            <button className="rw-button" title={email} onClick={signOut}>
+              Sign out
+            </button>
           </div>
         </header>
         <main className="content">
+          {driveError && (
+            <div className="notice orange-notice" role="alert">
+              {driveError}
+            </div>
+          )}
           {storageError && (
             <div className="notice orange-notice" role="alert">
               {storageError}
@@ -531,8 +588,9 @@ function App() {
           <div className="local-storage-banner">
             <ShieldCheck size={16} />
             <span>
-              <strong>Local workspace</strong> · Data stays in this browser. To
-              move to another device, export and import a backup.
+              <strong>Google Drive connected</strong> · Files sync through each
+              project’s vault. Notes, tasks and tracking sheets stay in this
+              browser; export/import a backup to move them between devices.
             </span>
             <button
               onClick={() => {
@@ -959,13 +1017,10 @@ function App() {
                 project={picked}
                 store={db}
                 onCreate={(kind, initial) => open(kind, initial)}
-                onEditNote={(n) =>
-                  open(
-                    "note",
-                    { projectId: n.projectId, title: n.title, body: n.body },
-                    n.id,
-                  )
-                }
+                onCreateNote={(n) => mutate("notes", n)}
+                onPatchNote={(id, data) => patch("notes", id, data)}
+                onPatchPaper={(id, data) => patch("papers", id, data)}
+                onDeletePaper={(id) => remove("papers", id)}
                 onDeleteNote={(id) => remove("notes", id)}
                 onOpenSection={(section, projectId) => {
                   setProject(projectId);
@@ -1143,59 +1198,12 @@ function App() {
                   {shownPapers.length} references
                 </span>
               </div>
-              <div className="panel resource-list">
-                {shownPapers.map((p) => (
-                  <div key={p.id} className="resource-row">
-                    <div className="resource-icon purple-bg">
-                      <BookOpen size={20} />
-                    </div>
-                    <div className="resource-main">
-                      <h3>{p.title}</h3>
-                      <p>
-                        {p.authors}
-                        {p.year ? " · " + p.year : ""} ·{" "}
-                        {projectName(p.projectId)}
-                      </p>
-                      <small>{p.notes}</small>
-                    </div>
-                    <span className="status-pill">{p.status}</span>
-                    {p.url && (
-                      <a
-                        title="Open reference"
-                        className="icon-btn"
-                        href={safeUrl(p.url)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink size={17} />
-                      </a>
-                    )}
-                    <button
-                      className="icon-btn"
-                      onClick={() =>
-                        open(
-                          "paper",
-                          Object.fromEntries(
-                            Object.entries(p).map(([k, v]) => [k, String(v)]),
-                          ),
-                          p.id,
-                        )
-                      }
-                    >
-                      <Settings size={16} />
-                    </button>
-                    <button
-                      className="icon-btn"
-                      onClick={() => remove("papers", p.id)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-                {shownPapers.length === 0 && (
-                  <Empty text="No references yet. Add a paper with a DOI, link, and notes." />
-                )}
-              </div>
+              <LiteratureSheet
+                papers={shownPapers}
+                projects={db.projects}
+                onChange={(id, data) => patch("papers", id, data)}
+                onDelete={(id) => remove("papers", id)}
+              />
             </>
           )}
           {view === "assets" && (
@@ -1212,9 +1220,8 @@ function App() {
               <div className="notice">
                 <Database size={18} />
                 <span>
-                  Store large files in Google Drive or another trusted service,
-                  then attach their links here. This MVP indexes links; it does
-                  not upload files.
+                  Upload files in a project’s Documents vault to save them in
+                  Google Drive. This section indexes additional resource links.
                 </span>
               </div>
               <div className="toolbar">
@@ -1300,50 +1307,17 @@ function App() {
                 <span className="push" />
                 <span className="filter-info">{shownNotes.length} notes</span>
               </div>
-              <div className="notes-grid">
-                {shownNotes.map((n) => (
-                  <article key={n.id} className="note-card">
-                    <div className="note-top">
-                      <NotebookPen size={20} />
-                      <span>{n.updated}</span>
-                    </div>
-                    <h3>{n.title}</h3>
-                    <p>{n.body}</p>
-                    <div className="note-bottom">
-                      <span className="small-project">
-                        {projectName(n.projectId)}
-                      </span>
-                      <span className="push" />
-                      <button
-                        className="icon-btn"
-                        title="Edit note"
-                        onClick={() =>
-                          open(
-                            "note",
-                            Object.fromEntries(
-                              Object.entries(n).map(([k, v]) => [k, String(v)]),
-                            ),
-                            n.id,
-                          )
-                        }
-                      >
-                        <Settings size={16} />
-                      </button>
-                      <button
-                        className="icon-btn"
-                        onClick={() => remove("notes", n.id)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </article>
-                ))}
-                {shownNotes.length === 0 && (
-                  <Empty text="No notes found. Capture your first research insight." />
-                )}
-              </div>
+              <StickyNotes
+                notes={shownNotes}
+                projects={db.projects}
+                projectId={project === "all" ? undefined : project}
+                onCreate={(n) => mutate("notes", n)}
+                onChange={(id, data) => patch("notes", id, data)}
+                onDelete={(id) => remove("notes", id)}
+              />
             </>
           )}
+          {view === "assistant" && <AIAssistant store={db} />}
           {view === "team" && (
             <>
               <PageTitle
@@ -1478,11 +1452,14 @@ function App() {
                   </div>
                   <h3>Privacy & storage</h3>
                   <p>
-                    Data currently lives only in this browser's localStorage.
-                    Clearing browser data can erase it. Export regular backups.
+                    Notes, tasks and project records save in this browser.
+                    Confirmed uploads are in Google Drive; pending files have
+                    only a browser copy. Export regular JSON backups and keep
+                    pending files until upload succeeds.
                   </p>
                   <div className="system-pill">
-                    <span className="live-dot" /> Local-only mode
+                    <span className="live-dot" /> Local records + private Drive
+                    files
                   </div>
                 </section>
                 <section className="panel settings-panel">
@@ -1639,10 +1616,26 @@ function App() {
                       onChange={(v) => setForm({ ...form, visibility: v })}
                     />
                     <small className="form-hint">
-                      Visibility is descriptive in local mode; it does not grant
-                      real access.
+                      This label does not change Google Drive sharing
+                      permissions. Files created by ResearchOS remain private by
+                      default.
                     </small>
                   </>
+                )}
+                {modal === "project" && (
+                  <label className="field">
+                    <span>Research proposal file (optional)</span>
+                    <input
+                      type="file"
+                      aria-label="Research proposal file (optional)"
+                      accept=".pdf,.doc,.docx,.txt,.md"
+                      onChange={(e) => setProposal(e.target.files?.[0] || null)}
+                    />
+                    <small>
+                      Saved in this project’s Research Proposal folder in Google
+                      Drive. Maximum 50 MB.
+                    </small>
+                  </label>
                 )}
                 {modal === "task" && (
                   <>
@@ -1732,13 +1725,31 @@ function App() {
                       onChange={(v) => setForm({ ...form, status: v })}
                     />
                     <Field
-                      label="Key findings / research gap"
+                      label="Additional notes"
                       textarea
                       value={form.notes}
                       onChange={(v) => setForm({ ...form, notes: v })}
                     />
                   </>
                 )}
+                {modal === "paper" &&
+                  (
+                    [
+                      ["abstractSummary", "Abstract summary"],
+                      ["gap", "Research gap"],
+                      ["methods", "Methods"],
+                      ["findings", "Key findings"],
+                      ["relevance", "Relevance"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <Field
+                      key={key}
+                      label={label}
+                      textarea
+                      value={form[key]}
+                      onChange={(v) => setForm({ ...form, [key]: v })}
+                    />
+                  ))}
                 {modal === "asset" && (
                   <>
                     <Field
@@ -1841,7 +1852,7 @@ function App() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="primary">
+                <button type="submit" className="primary" disabled={saving}>
                   <Check size={16} />
                   {editing ? "Save changes" : "Save to workspace"}
                 </button>
@@ -2068,4 +2079,8 @@ function Empty({ text }: { text: string }) {
     </div>
   );
 }
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <GoogleGate>
+    <App />
+  </GoogleGate>,
+);

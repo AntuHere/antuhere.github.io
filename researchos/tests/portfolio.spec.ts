@@ -1,3 +1,4 @@
+import {mockGoogle,signIn} from "./google-mock";
 import {test, expect} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 
@@ -13,6 +14,7 @@ const dois = [
 
 test.beforeEach(async ({page}) => {
   await page.route('**/*', route => route.request().url().startsWith('http://127.0.0.1:4173/') ? route.continue() : route.abort());
+  await mockGoogle(page);
 });
 
 test('academic identity, seven compact publication cards, five ongoing studies, and education match the supplied content', async ({page}) => {
@@ -90,5 +92,6 @@ test('academic links, PDF download, existing themes, section layout and Research
   await expect(page.locator('.wave-emoji')).toHaveCSS('animation-name', 'wave');
   await expect(page.locator('#greeting .main-button').first()).toHaveCSS('background-color', 'rgb(85, 25, 139)');
   await page.goto('/researchos/');
+  await signIn(page);
   await expect(page.getByRole('heading', {name: 'Good to see you back.'})).toBeVisible();
 });

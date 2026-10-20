@@ -1826,3 +1826,351 @@ select:focus-visible {
     bottom: 16px;
   }
 }
+/* Research writing, Drive and account screens */
+.signin-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #10131e;
+  color: #e9ecf5;
+  padding: 24px;
+  font-family: Inter, system-ui, sans-serif;
+}
+.signin-card {
+  width: 100%;
+  max-width: 600px;
+  padding: 36px;
+  background: #1a1f30;
+  border: 1px solid #343b55;
+  border-radius: 22px;
+  box-shadow: 0 20px 80px #0004;
+  display: grid;
+  gap: 20px;
+}
+.signin-card h1 {
+  font-size: 30px;
+  margin: 0;
+}
+.signin-card p,
+.signin-card small {
+  line-height: 1.7;
+}
+.signin-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #b4a8ff;
+  font-size: 24px;
+}
+.signin-card a {
+  color: #bdc8ff;
+}
+.signin-setup {
+  background: #121724;
+  padding: 18px;
+  border-radius: 12px;
+}
+.signin-setup summary {
+  cursor: pointer;
+}
+.signin-setup input {
+  width: 100%;
+  padding: 12px;
+  background: #242c40;
+  border: 1px solid #505c7c;
+  color: white;
+  border-radius: 8px;
+}
+.signin-card .primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  background: #7965e9;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.signin-card button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.signin-card code {
+  overflow-wrap: anywhere;
+}
+.sticky-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin: 14px 0 22px;
+  flex-wrap: wrap;
+}
+.sticky-toolbar > span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.sticky-toolbar button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sticky-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 22px;
+}
+.sticky-note {
+  color-scheme: light;
+  padding: 18px;
+  border-radius: 4px 4px 18px 4px;
+  box-shadow: 0 8px 20px #0002;
+  color: #292b33;
+  min-width: 0;
+}
+.sticky-yellow {
+  background: #f7e9a6;
+}
+.sticky-mint {
+  background: #bae8d3;
+}
+.sticky-pink {
+  background: #f4c8d4;
+}
+.sticky-violet {
+  background: #d9cff2;
+}
+.sticky-note input,
+.sticky-note textarea,
+.sticky-note select {
+  background: transparent;
+  color: #292b33;
+  border: 0;
+  outline-offset: 3px;
+  border-radius: 4px;
+  max-width: 100%;
+}
+.sticky-note input {
+  width: 100%;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 12px 0;
+}
+.sticky-note textarea {
+  width: 100%;
+  min-height: 170px;
+  resize: vertical;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.sticky-note textarea::placeholder,
+.sticky-note input::placeholder {
+  color: #4d5266;
+}
+.sticky-controls,
+.sticky-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sticky-controls select {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+}
+.sticky-controls button {
+  background: transparent;
+  color: #292b33;
+  border: 0;
+  padding: 8px;
+  cursor: pointer;
+}
+.sticky-controls button[aria-pressed="true"] {
+  background: #ffffff60;
+}
+.sticky-footer {
+  justify-content: space-between;
+  margin-top: 10px;
+}
+.sticky-footer small {
+  font-size: 11px;
+}
+.paper-sheet {
+  min-width: 0;
+}
+.paper-sheet .table-scroll {
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.paper-sheet table {
+  border-collapse: collapse;
+  min-width: 2650px;
+  width: 100%;
+}
+.paper-sheet th {
+  padding: 14px;
+  text-align: left;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.paper-sheet td {
+  padding: 8px;
+  vertical-align: top;
+  border-top: 1px solid var(--border);
+}
+.paper-sheet textarea {
+  width: 220px;
+  min-height: 105px;
+  resize: vertical;
+  line-height: 1.5;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+}
+.paper-sheet select {
+  max-width: 170px;
+}
+.paper-sheet button,
+.document-preview button {
+  cursor: pointer;
+}
+.assistant-panel {
+  padding: 28px;
+  display: grid;
+  gap: 18px;
+  max-width: 1000px;
+}
+.assistant-panel h1,
+.assistant-panel h3,
+.assistant-panel p {
+  margin: 0;
+}
+.assistant-panel label {
+  display: grid;
+  gap: 10px;
+}
+.assistant-panel textarea {
+  min-height: 150px;
+}
+.assistant-panel pre,
+.document-preview pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.65;
+  font-family: inherit;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.vault-upload {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 20px 0;
+}
+.vault-upload label:first-child {
+  display: grid;
+  gap: 8px;
+}
+.vault-upload input {
+  width: 210px;
+  max-width: 100%;
+  font-size: 12px;
+}
+.vault-upload .rw-button {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 8px;
+}
+.rw-file {
+  flex-wrap: wrap;
+}
+.document-preview {
+  background: var(--panel, #1c2233);
+  color: var(--text, #edf0f8);
+  width: min(1000px, 96vw);
+  height: 90vh;
+  border-radius: 16px;
+  padding: 24px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.document-preview header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.document-preview h3 {
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.document-preview iframe {
+  width: 100%;
+  flex: 1;
+  min-height: 55vh;
+  border: 0;
+  background: white;
+}
+.document-preview pre {
+  overflow: auto;
+  flex: 1;
+}
+.document-preview a {
+  color: #a99af8;
+}
+.rw-pane > label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+}
+.rw-pane select {
+  max-width: 100%;
+}
+.rw-file-info {
+  min-width: 160px;
+}
+.rw-file-info b {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .signin-card {
+    padding: 24px;
+  }
+  .sticky-grid {
+    grid-template-columns: 1fr;
+  }
+  .sticky-toolbar {
+    align-items: stretch;
+  }
+  .sticky-toolbar button {
+    justify-content: center;
+  }
+  .document-preview {
+    padding: 16px;
+  }
+  .top-controls > .rw-button {
+    font-size: 11px;
+    padding: 8px;
+  }
+  .rw-actions {
+    flex-wrap: wrap;
+  }
+  .assistant-panel {
+    padding: 20px;
+  }
+  .paper-sheet {
+    max-width: 100%;
+  }
+}

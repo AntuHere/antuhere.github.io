@@ -1,3 +1,4 @@
+import {mockGoogle,signIn} from "./google-mock";
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -19,6 +20,7 @@ test.beforeEach(async ({ page }) => {
       ? route.continue()
       : route.abort(),
   );
+  await mockGoogle(page);
 });
 
 test("portfolio navigation and direct Pages paths work on desktop and phone", async ({
@@ -34,11 +36,13 @@ test("portfolio navigation and direct Pages paths work on desktop and phone", as
     await page.locator(".menu-icon").click();
   await page.getByRole("link", { name: "ResearchOS", exact: true }).click();
   await expect(page).toHaveURL(/\/researchos\/$/);
+  await signIn(page);
   await expect(
     page.getByRole("heading", { name: "Good to see you back." }),
   ).toBeVisible();
   await page.goto("/researchos");
   await page.reload();
+  await signIn(page);
   await expect(
     page.getByRole("heading", { name: "Good to see you back." }),
   ).toBeVisible();
@@ -64,6 +68,7 @@ test("portfolio navigation and direct Pages paths work on desktop and phone", as
   });
   await page.getByRole("button", { name: "Toggle theme" }).click();
   await page.reload();
+  await signIn(page);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page
     .getByRole("searchbox", { name: "Search workspace" })
@@ -76,6 +81,7 @@ test("create and edit a project, complete a task, and persist a note", async ({
   page,
 }) => {
   await page.goto("/researchos/");
+  await signIn(page);
   await page
     .locator("main")
     .getByRole("button", { name: "New project", exact: true })
@@ -118,16 +124,18 @@ test("create and edit a project, complete a task, and persist a note", async ({
       .getByText("Collect field observations"),
   ).toBeVisible();
   await page.reload();
+  await signIn(page);
   await navigate(page, "Research notes");
   await expect(
-    page.getByText("Sample each location twice.", { exact: true }),
-  ).toBeVisible();
+    page.getByRole("textbox",{name:"Sticky note text"}).last(),
+  ).toHaveValue("Sample each location twice.");
 });
 
 test("project stages remain isolated and JSON backup restores records and workflows", async ({
   page,
 }) => {
   await page.goto("/researchos/");
+  await signIn(page);
   await navigate(page, "Rickshaw PUDO");
   await page.getByLabel("Define problem statement").check();
   await page
@@ -166,6 +174,7 @@ test("project stages remain isolated and JSON backup restores records and workfl
     page.getByText("Backup restored", { exact: true }),
   ).toBeVisible();
   await page.reload();
+  await signIn(page);
   await navigate(page, "Rickshaw PUDO");
   await expect(page.getByLabel("Define problem statement")).toBeChecked();
   await expect(page.getByLabel("Working notes for this stage")).toHaveValue(
@@ -190,6 +199,7 @@ test("document uploads persist, download intact, and remain project-specific", a
   page,
 }) => {
   await page.goto("/researchos/");
+  await signIn(page);
   await navigate(page, "Rickshaw PUDO");
   await page.getByRole("tab", { name: "Documents vault" }).click();
   await page.locator("input[type=file]").setInputFiles({
@@ -198,7 +208,7 @@ test("document uploads persist, download intact, and remain project-specific", a
     buffer: Buffer.from("My original observations"),
   });
   const row = page.locator(".rw-file").filter({ hasText: "observations.txt" });
-  await expect(row).toBeVisible();
+  await expect(row).toContainText("Saved in Drive");
   const event = page.waitForEvent("download");
   await row.getByRole("button", { name: "Download file" }).click();
   const download = await event;
@@ -206,6 +216,7 @@ test("document uploads persist, download intact, and remain project-specific", a
     "My original observations",
   );
   await page.reload();
+  await signIn(page);
   await navigate(page, "Rickshaw PUDO");
   await page.getByRole("tab", { name: "Documents vault" }).click();
   await expect(row).toBeVisible();

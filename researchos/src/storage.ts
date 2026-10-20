@@ -53,6 +53,20 @@ export function parseBackup(text: string): {
         ids.has(row.id)
       )
         throw Error("Invalid record");
+      if (
+        key === "papers" &&
+        ["abstractSummary", "gap", "methods", "findings", "relevance"].some(
+          (field) => row[field] !== undefined && typeof row[field] !== "string",
+        )
+      )
+        throw Error("Invalid paper fields");
+      if (
+        key === "notes" &&
+        ((row.pinned !== undefined && typeof row.pinned !== "boolean") ||
+          (row.color !== undefined &&
+            !["yellow", "mint", "pink", "violet"].includes(row.color)))
+      )
+        throw Error("Invalid note fields");
       ids.add(row.id);
       if (
         key === "projects" &&

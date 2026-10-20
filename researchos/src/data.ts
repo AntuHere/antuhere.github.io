@@ -42,6 +42,11 @@ export interface Paper {
   status: "To read" | "Reading" | "Reviewed";
   notes: string;
   url: string;
+  abstractSummary?: string;
+  gap?: string;
+  methods?: string;
+  findings?: string;
+  relevance?: string;
 }
 export interface Asset {
   id: string;
@@ -57,6 +62,8 @@ export interface Note {
   title: string;
   body: string;
   updated: string;
+  color?: "yellow" | "mint" | "pink" | "violet";
+  pinned?: boolean;
 }
 export interface Member {
   id: string;
