@@ -58,9 +58,21 @@ test('research illustration, five honest scopes and volunteering details render 
     await page.waitForTimeout(1100);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   }
-  // Missing originals stay explicit in this draft; media readiness is checked
-  // separately by npm run check:media and currently blocks publication.
-  await expect(page.locator('#projects .portfolio-image-pending')).toHaveCount(5);
-  await expect(page.locator('#volunteering .portfolio-image-pending')).toHaveCount(2);
+  // Research photographs were explicitly deferred; no empty image slots appear.
+  await expect(page.locator('#projects figure')).toHaveCount(0);
+  await expect(page.locator('.portfolio-image-pending')).toHaveCount(0);
+  const emblem = page.getByRole('img', {name: 'Official Islamic University of Technology (IUT) emblem', exact: true});
+  await expect(emblem).toHaveAttribute('src', '/images/iut-logo.png');
+  await expect(emblem).toHaveCSS('object-fit', 'contain');
+  await expect(page.locator('#education .education-initials')).toHaveCount(0);
+  const volunteeringImages = page.locator('#volunteering img');
+  await expect(volunteeringImages).toHaveCount(3);
+  for (const image of await volunteeringImages.all()) {
+    await image.scrollIntoViewIfNeeded();
+    await expect(image).toBeVisible();
+    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+    await expect(image).toHaveCSS('object-fit', 'contain');
+  }
+  await expect.poll(() => emblem.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth === 447 && element.naturalHeight === 732)).toBe(true);
   expect(brokenImages).toEqual([]);
 });

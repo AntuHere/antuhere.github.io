@@ -14,8 +14,13 @@ export default function Volunteering() {
       <section className="main" id="volunteering">
         <h1 className="skills-heading">{volunteering.title}</h1>
         <article className={isDark ? "dark-mode project-card project-card-dark" : "project-card project-card-light"}>
-          <h2 className={isDark ? "dark-mode card-title" : "card-title"}>{volunteering.organization}</h2>
-          <p><strong>{volunteering.role}</strong></p>
+          <div className="volunteering-identity">
+            <PortfolioImage asset={volunteering.logo} className="volunteering-logo" />
+            <div>
+              <h2 className={isDark ? "dark-mode card-title" : "card-title"}>{volunteering.organization}</h2>
+              <p><strong>{volunteering.role}</strong></p>
+            </div>
+          </div>
           <p className={isDark ? "dark-mode card-subtitle" : "card-subtitle"}>{volunteering.description}</p>
           <div className="volunteering-gallery">
             {volunteering.photos.map(photo => <PortfolioImage key={photo.filename} asset={photo} />)}

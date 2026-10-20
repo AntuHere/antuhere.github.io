@@ -153,6 +153,7 @@ const volunteering = {
   role: "Co-founder & Volunteer",
   description: "Co-founder and volunteer at BB Mobile School, a community-focused initiative. Contributed to volunteer activities, team coordination, and community engagement.",
   url: "https://www.facebook.com/BB.MobileSchool",
+  logo: portfolioMedia.volunteerLogo,
   photos: [portfolioMedia.volunteerGroup, portfolioMedia.volunteerBanner]
 };
 

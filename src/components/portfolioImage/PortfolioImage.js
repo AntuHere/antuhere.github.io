@@ -1,20 +1,13 @@
 import React from "react";
 import "./PortfolioImage.css";
 
-// Original photo files must be available locally before assigning asset.src.
-// Draft placeholders are explicit and never substitute a synthetic research photo.
+// Optional research photos can be added later without empty or broken slots.
 export default function PortfolioImage({asset, className = "", eager = false}) {
+  if (!asset || !asset.src) return null;
   return (
     <figure className={`portfolio-image ${className}`}>
-      {asset && asset.src ? (
-        <img src={asset.src} alt={asset.alt} loading={eager ? "eager" : "lazy"} decoding="async" />
-      ) : (
-        <div className="portfolio-image-pending" role="img" aria-label={asset ? asset.alt : "Research photograph"}>
-          <i className="fas fa-image" aria-hidden="true"></i>
-          <span>Original photograph pending</span>
-        </div>
-      )}
-      {asset && asset.credit && <figcaption className="subTitle"><a href={asset.credit.url} target="_blank" rel="noopener noreferrer">{asset.credit.text}</a>{asset.credit.license && ` · ${asset.credit.license}`}</figcaption>}
+      <img src={asset.src} alt={asset.alt} width={asset.width} height={asset.height} loading={eager ? "eager" : "lazy"} decoding="async" />
+      {asset.credit && <figcaption className="subTitle"><a href={asset.credit.url} target="_blank" rel="noopener noreferrer">{asset.credit.text}</a>{asset.credit.license && ` · ${asset.credit.license}`}</figcaption>}
     </figure>
   );
 }

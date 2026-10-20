@@ -1,6 +1,10 @@
 .volunteering-gallery { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; align-items: center; margin: 18px 0; }
 /* Preserve the original faces and full banner; do not crop gallery photos. */
 .volunteering-gallery img { object-fit: contain; }
+.volunteering-identity { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.volunteering-logo { flex: 0 0 80px; }
+.volunteering-logo img { object-fit: contain; }
+.volunteering-identity > div { min-width: 0; }
 #volunteering .main-button { margin-right: 0; max-width: 100%; box-sizing: border-box; }
 @media (max-width: 768px) {
   .volunteering-gallery { grid-template-columns: minmax(0, 1fr); }

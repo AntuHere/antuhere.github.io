@@ -5,43 +5,61 @@
     "alt": "Engineering researcher reviewing traffic video with vehicle detection boxes, trajectories, papers and charts"
   },
   "iutLogo": {
-    "src": null,
+    "src": "/images/iut-logo.png",
     "filename": "iut-logo.png",
-    "alt": "Official Islamic University of Technology (IUT) emblem"
+    "alt": "Official Islamic University of Technology (IUT) emblem",
+    "width": 447,
+    "height": 732
   },
   "rickshaw": {
     "src": null,
     "filename": "rickshaw-stopping.webp",
-    "alt": "Rickshaw passenger boarding or alighting beside a road in Dhaka"
+    "alt": "Rickshaw passenger boarding or alighting beside a road in Dhaka",
+    "required": false
   },
   "lateral": {
     "src": null,
     "filename": "mixed-traffic.webp",
-    "alt": "Elevated view of rickshaws, cars, motorcycles and buses in heterogeneous urban traffic"
+    "alt": "Elevated view of rickshaws, cars, motorcycles and buses in heterogeneous urban traffic",
+    "required": false
   },
   "waste": {
     "src": null,
     "filename": "road-construction-waste.webp",
-    "alt": "Broken concrete, bricks and road construction debris beside a roadway"
+    "alt": "Broken concrete, bricks and road construction debris beside a roadway",
+    "required": false
   },
   "emergency": {
     "src": null,
     "filename": "emergency-access.webp",
-    "alt": "Ambulance navigating congested mixed urban traffic"
+    "alt": "Ambulance navigating congested mixed urban traffic",
+    "required": false
   },
   "curbside": {
     "src": null,
     "filename": "curbside-occupancy.webp",
-    "alt": "Roadside rickshaw occupancy and informal passenger-serving activity in Dhaka"
+    "alt": "Roadside rickshaw occupancy and informal passenger-serving activity in Dhaka",
+    "required": false
   },
   "volunteerGroup": {
-    "src": null,
+    "src": "/images/bb-mobile-school-volunteers.webp",
     "filename": "bb-mobile-school-volunteers.webp",
-    "alt": "BB Mobile School volunteers together at a community location"
+    "alt": "BB Mobile School volunteers together at a community location",
+    "width": 1280,
+    "height": 825
   },
   "volunteerBanner": {
-    "src": null,
+    "src": "/images/bb-mobile-school-banner.webp",
     "filename": "bb-mobile-school-banner.webp",
-    "alt": "BB Mobile School Find Educate Build team banner"
+    "alt": "BB Mobile School Find Educate Build team banner",
+    "width": 820,
+    "height": 312
+  },
+  "volunteerLogo": {
+    "src": "/images/bb-mobile-school-logo.jpg",
+    "filename": "bb-mobile-school-logo.jpg",
+    "alt": "BB Mobile School organization logo",
+    "width": 890,
+    "height": 890
   }
 }
