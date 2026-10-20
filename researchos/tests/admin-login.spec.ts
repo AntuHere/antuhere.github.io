@@ -17,7 +17,7 @@ test("admin login remembers this browser, works without Google, and signs out wi
     page.getByRole("heading", { name: "Admin login" }),
   ).toBeVisible();
   await expect(page.getByLabel("Google OAuth Web client ID")).toHaveCount(0);
-  await page.getByLabel("Username", { exact: true }).fill("admin");
+  await page.getByLabel("Username", { exact: true }).fill("antuhere");
   await page.getByLabel("Password", { exact: true }).fill("wrong");
   await page.getByRole("button", { name: "Log in", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText(
@@ -47,13 +47,11 @@ test("admin login remembers this browser, works without Google, and signs out wi
     .click();
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Project name").fill("Local project");
-  await dialog
-    .getByLabel("Research proposal file (optional)")
-    .setInputFiles({
-      name: "local-proposal.txt",
-      mimeType: "text/plain",
-      buffer: Buffer.from("My local proposal"),
-    });
+  await dialog.getByLabel("Research proposal file (optional)").setInputFiles({
+    name: "local-proposal.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("My local proposal"),
+  });
   await dialog.getByRole("button", { name: "Save to workspace" }).click();
   await navigate(page, "Projects");
   await page.getByRole("button", { name: /Local project.*Private/ }).click();
@@ -93,4 +91,28 @@ test("admin login remembers this browser, works without Google, and signs out wi
       Object.keys(localStorage).some((k) => /password/i.test(k)),
     ),
   ).toBe(false);
+});
+
+test("old admin credentials and remembered sessions no longer open the workspace", async ({
+  page,
+}) => {
+  await page.goto("/researchos/");
+  await page.evaluate(() =>
+    localStorage.setItem("researchos-admin-session", "admin"),
+  );
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Admin login" }),
+  ).toBeVisible();
+  await page.getByLabel("Username", { exact: true }).fill("admin");
+  await page.getByLabel("Password", { exact: true }).fill("admin");
+  await page.getByRole("button", { name: "Log in", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Incorrect username or password",
+  );
+  await expect(page.locator(".app")).toHaveCount(0);
+  await adminSignIn(page);
+  await expect(
+    page.getByRole("heading", { name: "Good to see you back." }),
+  ).toBeVisible();
 });

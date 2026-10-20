@@ -113,9 +113,14 @@ export async function mockGoogle(
   };
 }
 export async function adminSignIn(page: Page) {
+  const password = process.env.RESEARCHOS_TEST_PASSWORD;
+  if (!password)
+    throw Error(
+      "Set RESEARCHOS_TEST_PASSWORD to the configured workspace password before running login tests.",
+    );
   if (await page.getByRole("heading", { name: "Admin login" }).isVisible()) {
-    await page.getByLabel("Username", { exact: true }).fill("admin");
-    await page.getByLabel("Password", { exact: true }).fill("admin");
+    await page.getByLabel("Username", { exact: true }).fill("antuhere");
+    await page.getByLabel("Password", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Log in", exact: true }).click();
   }
   await expect(

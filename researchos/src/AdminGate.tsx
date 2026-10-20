@@ -3,6 +3,11 @@ import { FlaskConical, LogIn } from "lucide-react";
 
 // This is a browser convenience lock on a public static site, not server authentication.
 const KEY = "researchos-admin-session";
+const USERNAME = "antuhere";
+const SESSION = "antuhere-v1";
+// A digest avoids publishing the literal password; this browser lock can still be bypassed.
+const PASSWORD_DIGEST =
+  "6324e6344c2b00b268776ea379bf32860ce5d05c0c798c54e7348983e2a7432b";
 const AdminContext = createContext<{ signOut: () => void } | null>(null);
 export function useAdmin() {
   const value = useContext(AdminContext);
@@ -11,10 +16,10 @@ export function useAdmin() {
 }
 function remembered() {
   try {
-    if (localStorage.getItem(KEY) === "admin") return true;
+    if (localStorage.getItem(KEY) === SESSION) return true;
   } catch {}
   try {
-    return sessionStorage.getItem(KEY) === "admin";
+    return sessionStorage.getItem(KEY) === SESSION;
   } catch {
     return false;
   }
@@ -24,7 +29,8 @@ export default function AdminGate({ children }: { children: ReactNode }) {
     [username, setUsername] = useState(""),
     [password, setPassword] = useState(""),
     [remember, setRemember] = useState(true),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false);
   const signOut = () => {
     try {
       localStorage.removeItem(KEY);
@@ -52,22 +58,39 @@ export default function AdminGate({ children }: { children: ReactNode }) {
         <p>Open your research workspace.</p>
         <form
           className="admin-login-form"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            if (username.trim() !== "admin" || password !== "admin") {
-              setError("Incorrect username or password.");
-              return;
-            }
-            try {
-              if (remember) localStorage.setItem(KEY, "admin");
-              else localStorage.removeItem(KEY);
-            } catch {}
-            try {
-              sessionStorage.setItem(KEY, "admin");
-            } catch {}
-            setPassword("");
+            if (busy) return;
+            setBusy(true);
             setError("");
-            setLoggedIn(true);
+            try {
+              const digest = await crypto.subtle.digest(
+                "SHA-256",
+                new TextEncoder().encode(password),
+              );
+              const value = Array.from(new Uint8Array(digest), (byte) =>
+                byte.toString(16).padStart(2, "0"),
+              ).join("");
+              if (username.trim() !== USERNAME || value !== PASSWORD_DIGEST) {
+                setError("Incorrect username or password.");
+                return;
+              }
+              try {
+                if (remember) localStorage.setItem(KEY, SESSION);
+                else localStorage.removeItem(KEY);
+              } catch {}
+              try {
+                sessionStorage.setItem(KEY, SESSION);
+              } catch {}
+              setPassword("");
+              setLoggedIn(true);
+            } catch {
+              setError(
+                "Could not check the login. Open ResearchOS over HTTPS and try again.",
+              );
+            } finally {
+              setBusy(false);
+            }
           }}
         >
           <label className="field">
@@ -106,7 +129,7 @@ export default function AdminGate({ children }: { children: ReactNode }) {
               {error}
             </p>
           )}
-          <button className="primary" type="submit">
+          <button className="primary" type="submit" disabled={busy}>
             <LogIn size={18} />
             Log in
           </button>
