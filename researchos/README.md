@@ -44,16 +44,23 @@ That command preserves the published portfolio's generated GitHub profile data w
 
 After deployment, visit **https://antuhere.github.io/researchos/** from either device. The interface adapts to touch screens and has a collapsible navigation menu.
 
-This first version uses **local storage with manual backup**, as requested:
+ResearchOS saves records locally first and **automatically syncs through Google Drive when connected**:
 
-- Projects, tasks, literature, notes and planned collaborators live in this browser's localStorage.
-- Each project's nine pipeline stages have separate custom work steps and sticky notes. Add your own to-dos; no fixed checklist is shown. Existing working notes become editable stage sticky notes.
-- Uploaded documents live in this browser's IndexedDB. They survive reloads, but they are not uploaded to a server.
-- **Settings → Export backup** downloads JSON containing records and stage workflows. On another device, use **Settings → Import backup**. Import replaces that device's workspace; it does not merge changes.
-- JSON backup does **not** contain uploaded document contents. Keep originals in Drive or another file store and attach their links for use across devices.
-- Browser storage can be cleared. Export backups regularly. The six starting projects and their progress are illustrative sample data, not verified research results.
+1. On the laptop that contains your notes, refresh ResearchOS, open **Settings**, and connect Drive as `nasfiqul.antu@gmail.com`.
+2. Click **Sync now** and wait for **Workspace saved to Drive** before opening the other device.
+3. On your phone, refresh ResearchOS, use the same admin login, and connect the same Google account in **Settings**. The workspace loads automatically; **Sync now** also checks immediately.
+4. Open the same project and pipeline stage. Its custom work steps and sticky notes now appear on both devices.
 
-Hosting does not enable automatic synchronization, accounts, shared permissions, or live collaboration. Planned invitations remain local records and do not send email. Cloud synchronization can be added separately when an authentication/storage service is selected. Portfolio and ResearchOS use the same website origin; local browser data is not an authenticated private cloud workspace.
+Edits upload after a short pause. Connected, visible tabs check for other-device changes every 30 seconds and when brought back into focus. Your admin login does not itself connect Drive. Google access can expire; reconnect when prompted. See [Google setup and sync details](../docs/researchos-google-setup.md).
+
+- Sync includes projects, tasks, literature tracking, notes, asset links, planned collaborators, and each project's nine stage workflows. Older stage working notes remain readable as sticky notes.
+- Pending edits remain in the browser until Drive confirms the save. Independent edits merge; conflicting edits to the same field pause sync with explicit recovery choices in Settings.
+- Without Drive, records remain local to that browser. **Settings → Export backup / Import backup** remains available for manual transfers. Import replaces local records and syncs that replacement if connected.
+- Uploaded documents have a separate IndexedDB recovery copy and upload through the project's categorized Drive vault. Workspace JSON does **not** contain document bytes; pending local files are not available on another device until uploaded.
+- Before applying a different cloud workspace, ResearchOS keeps a previous browser copy downloadable from Settings. Immutable JSON snapshots remain in the private Drive **Workspace sync** folder; do not delete or edit these while using sync. They currently accumulate without automatic cleanup.
+- Browser storage can be cleared. Keep independent backups. The six starting projects and their progress are illustrative sample data, not verified research results.
+
+The admin screen is a convenience lock on a public static site. Google authorization separately protects private Drive files; no sharing permissions are changed. Planned invitations do not send email or grant workspace access. This is a personal sync workspace, not a multi-user collaboration service.
 
 ## Checks
 
@@ -66,6 +73,6 @@ cd ..
 npm run test:researchos
 ```
 
-The runner uses Python 3 to serve the production `build/` directory. For an existing Chromium installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` instead of downloading a browser. Tests cover desktop and phone navigation, direct URLs, project/task/note editing, local persistence, project-stage isolation, JSON export/import, invalid backup rejection, document upload/download and responsive layout. External fonts and analytics are excluded from these local browser checks.
+The runner uses Python 3 to serve the production `build/` directory. For an existing Chromium installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` instead of downloading a browser. Set `RESEARCHOS_TEST_PASSWORD` to the configured workspace password in your local test environment. Tests cover separate laptop/phone sessions sharing a simulated Drive, concurrent edits and conflict recovery, failed sync retries, desktop and phone navigation, direct URLs, project/task/note editing, local persistence, project-stage isolation, JSON export/import, invalid backup rejection, document upload/download and responsive layout. External fonts and analytics are excluded from these local browser checks.
 
 The original portfolio's Jest suite has a pre-existing setup failure: undeclared `jest-canvas-mock`, `enzyme`, and `enzyme-adapter-react-16` imports. This integration does not disable or replace that test suite.

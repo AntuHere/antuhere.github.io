@@ -1,3 +1,5 @@
+import useWorkspaceSync from "./useWorkspaceSync";
+import { WORKFLOW_CHANGED, WORKFLOW_RESTORED } from "./workspaceSync";
 import AdminGate, { useAdmin } from "./AdminGate";
 import GoogleGate, { useGoogle } from "./GoogleGate";
 import StickyNotes from "./StickyNotes";
@@ -104,6 +106,7 @@ function App() {
   const [proposal, setProposal] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [db, setDb] = useState<Store>(loadStore);
+  const workspaceSync = useWorkspaceSync(db, setDb, drive);
   const [view, setView] = useState<View>("overview");
   const [project, setProject] = useState("all");
   const [focus, setFocus] = useState<string | null>(null);
@@ -370,6 +373,8 @@ function App() {
           workflows,
         );
         setDb(store);
+        window.dispatchEvent(new Event(WORKFLOW_RESTORED));
+        window.dispatchEvent(new Event(WORKFLOW_CHANGED));
         setProject("all");
         setFocus(null);
         notify("Backup restored");
@@ -599,14 +604,14 @@ function App() {
             <ShieldCheck size={16} />
             <span>
               <strong>
-                {drive ? "Google Drive connected" : "Local workspace"}
+                {workspaceSync.busy
+                  ? "Syncing workspace…"
+                  : workspaceSync.connected
+                    ? "Drive workspace sync"
+                    : "Local workspace"}
               </strong>{" "}
-              ·{" "}
-              {drive
-                ? "Files sync through each project’s vault."
-                : "Files save in this browser. Connect Drive in Settings when you want uploads."}{" "}
-              Notes, tasks and tracking sheets stay in this browser;
-              export/import a backup to move them between devices.
+              · {workspaceSync.message}
+              {workspaceSync.lastSynced && <> · {workspaceSync.lastSynced}</>}
             </span>
             <button
               onClick={() => {
@@ -1258,10 +1263,58 @@ function App() {
               <PageTitle
                 eyebrow="PREFERENCES & DATA"
                 title="Workspace settings"
-                desc="Control how your local workspace is saved and backed up."
+                desc="Control workspace sync, local storage and backups."
               />
               <div className="settings-grid">
                 {connection}
+                <section className="panel settings-panel">
+                  <h3>Sync across devices</h3>
+                  <p role="status">{workspaceSync.message}</p>
+                  <p>
+                    Connect the same Google account on your laptop and phone.
+                    Projects, workflow to-dos, sticky notes, tasks and paper
+                    tracking sync through Drive. Local document bytes are
+                    uploaded separately through the vault.
+                  </p>
+                  <button
+                    className="primary"
+                    disabled={!workspaceSync.connected || workspaceSync.busy}
+                    onClick={workspaceSync.syncNow}
+                  >
+                    Sync now
+                  </button>
+                  {workspaceSync.recoveryAvailable && (
+                    <button
+                      className="secondary"
+                      onClick={workspaceSync.downloadRecovery}
+                    >
+                      Download previous browser copy
+                    </button>
+                  )}
+                  {workspaceSync.conflict && (
+                    <div className="sync-conflict">
+                      <p>
+                        Export a browser backup before choosing which workspace
+                        to keep. Previous cloud snapshots remain in Drive.
+                      </p>
+                      <button className="secondary" onClick={exportData}>
+                        Export browser backup
+                      </button>
+                      <button
+                        className="secondary"
+                        onClick={workspaceSync.loadDrive}
+                      >
+                        Load latest Drive copy
+                      </button>
+                      <button
+                        className="secondary"
+                        onClick={workspaceSync.keepLocal}
+                      >
+                        Keep this browser copy
+                      </button>
+                    </div>
+                  )}
+                </section>
                 <section className="panel settings-panel">
                   <div className="settings-icon">
                     <Download size={22} />
@@ -1284,7 +1337,8 @@ function App() {
                   <h3>Restore a backup</h3>
                   <p>
                     Import a previously exported ResearchOS JSON backup. This
-                    replaces the data currently saved in this browser.
+                    replaces the data currently saved in this browser and syncs
+                    to connected devices.
                   </p>
                   <label className="secondary file-label">
                     <Upload size={16} /> Import backup
@@ -1304,14 +1358,15 @@ function App() {
                   </div>
                   <h3>Privacy & storage</h3>
                   <p>
-                    Notes, tasks and project records save in this browser.
-                    Confirmed uploads are in Google Drive; pending files have
-                    only a browser copy. Export regular JSON backups and keep
-                    pending files until upload succeeds.
+                    Notes, tasks and project records save in this browser first.
+                    When Drive is connected, workspace records sync
+                    automatically to your other connected devices. Pending
+                    changes and files remain local until their upload succeeds.
+                    Keep regular backups.
                   </p>
                   <div className="system-pill">
                     <span className="live-dot" /> Local records + private Drive
-                    files
+                    sync
                   </div>
                 </section>
                 <section className="panel settings-panel">
@@ -1323,14 +1378,15 @@ function App() {
                     Restore the six example research projects and their demo
                     resources. Current records, stage work steps and stage notes
                     will be overwritten. Uploaded document copies are kept in
-                    this browser.
+                    this browser. If Drive is connected, the reset will sync to
+                    your other devices.
                   </p>
                   <button
                     className="danger-button"
                     onClick={() => {
                       if (
                         confirm(
-                          "Reset all local workspace data to demo content?",
+                          "Reset workspace data to demo content? This reset also syncs to other devices when Drive is connected.",
                         )
                       ) {
                         clearWorkflows(

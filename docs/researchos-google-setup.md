@@ -2,7 +2,7 @@
 
 ResearchOS is published at https://antuhere.github.io/researchos/. Open it on your phone or laptop and log in with username **antuhere** and your configured workspace password. **Remember me on this browser** is enabled by default. This is a convenience lock on a public static site, not secure server authentication. Signing out clears the remembered login without deleting your local workspace.
 
-Google is optional: notes, project records, the tracker and local file uploads work without it. Connect Google Drive in **Settings** (or a project’s **Documents vault**) only when you want cloud file uploads. Google authentication and live Drive uploads require a Web client ID. No Google password, API key, service account, or client secret belongs in the site or in chat.
+Google is optional: notes, project records, the tracker and local file uploads work without it. Connect Google Drive in **Settings** (or a project’s **Documents vault**) when you want cloud file uploads or automatic workspace sync. Google authentication and live Drive uploads require a Web client ID. No Google password, API key, service account, or client secret belongs in the site or in chat.
 
 ## One-time setup (your Google account)
 
@@ -29,6 +29,7 @@ New projects create the following private folders. Existing projects create/disc
 
 ```text
 ResearchOS/
+  Workspace sync/  (private workspace history; managed by ResearchOS)
   Your project name/
     Papers/
     Literature Review/
@@ -46,7 +47,17 @@ PDF files have an embedded browser preview (some mobile browsers may download in
 
 ## Laptop and phone
 
-Drive documents are shared through the signed-in account. Project records, sticky notes, tasks, custom stage work steps, stage sticky notes and paper-tracking cells still save **locally in each browser**. Use **Settings → Export backup**, transfer the JSON backup, then **Import backup** on the other device. This is a manual replacement, not automatic record merging; export the destination workspace first if it contains changes you want to retain. JSON does not contain document bytes. Once the same project IDs are restored, its vault discovers the same Drive folders and files. Editing only the folder name or creating a fresh project with the same title does not link it to an old project ID.
+Drive now synchronizes both uploaded documents and workspace records. To bring **existing laptop notes** to your phone:
+
+1. Refresh ResearchOS on the laptop containing your notes. Open **Settings**, connect `nasfiqul.antu@gmail.com`, click **Sync now**, and wait for **Workspace saved to Drive**.
+2. Refresh ResearchOS on your phone, log in normally, then connect the same Google account in **Settings**. Its projects, stage work steps, stage sticky notes, project notes, tasks, paper tracking, asset links and planned collaborators load automatically.
+3. Open the same project and the same pipeline stage. Use **Sync now** to check immediately if needed.
+
+Your username/password login stays unchanged. It opens the app; it does not authorize Google access. Both devices must connect Drive for automatic sync. Disconnected devices continue saving locally until they reconnect. Uploads start after a short editing pause; connected visible tabs check every 30 seconds and on focus/returning online. Background mobile tabs cannot sync while the browser suspends them. Google access expiry still requires reconnecting as described above.
+
+Independent additions and edits merge. If two devices change the same field differently, sync pauses and keeps each browser's copy. In **Settings → Sync across devices**, export your browser backup before choosing **Load latest Drive copy** or **Keep this browser copy**. Those choices apply to the whole workspace. Before applying a changed cloud workspace, a previous browser copy is saved and can be downloaded from Settings. Drive uploads create immutable JSON snapshots with parent markers so simultaneous writes remain recoverable. Old snapshots are retained in **ResearchOS/Workspace sync** without automatic cleanup; do not manually edit or delete this folder while sync is in use. Snapshot metadata is app-private, and Drive sharing permissions remain unchanged.
+
+Manual **Export backup / Import backup** remains available. Import replaces local records and syncs that replacement when Drive is connected. JSON does not contain document bytes, OAuth tokens or login credentials. File bytes upload separately through the vault; a pending browser-only file is unavailable on another device until its upload succeeds. Synchronized project IDs allow the phone's vault to discover the same project folders.
 
 Project pages open directly into the pipeline without a separate Next steps list, status/progress summary cards, research-objective card or project-contents tiles. Existing project fields remain editable in Edit project, and earlier task records are still available in the Task board.
 
@@ -62,4 +73,4 @@ The **AI assistant** panel prepares and copies a project-context prompt. It make
 
 ## Validation
 
-Set `RESEARCHOS_TEST_PASSWORD` to the configured workspace password in your local test environment (do not commit it). Run `npm run build`, the ResearchOS TypeScript check, and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:researchos -- --workers=1`. Integration tests simulate Google sign-in and Drive responses: they verify admin login, remembered access, sign-out, optional Drive connection, owner rejection, access denial, folder/category creation, uploads, recovery/retry, original-byte downloads, previews, sticky-note persistence, sheet exports, and existing portfolio/workspace behavior. They do **not** prove live OAuth configuration or live Google Drive access. Complete the one-time setup above to validate those against your account.
+Set `RESEARCHOS_TEST_PASSWORD` to the configured workspace password in your local test environment (do not commit it). Run `npm run build`, the ResearchOS TypeScript check, and `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:researchos -- --workers=1`. Integration tests simulate Google sign-in and Drive responses: they verify admin login, remembered access, sign-out, optional Drive connection, owner rejection, access denial, folder/category creation, uploads, recovery/retry, original-byte downloads, previews, sticky-note persistence, two isolated laptop/phone sessions syncing through a shared simulated Drive, concurrent snapshot merging, conflict recovery, interrupted sync retry, sheet exports, and existing portfolio/workspace behavior. They do **not** prove live OAuth configuration or live Google Drive access. Complete the one-time setup above to validate those against your account.

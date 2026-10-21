@@ -1,3 +1,4 @@
+import { WORKFLOW_CHANGED, WORKFLOW_RESTORED } from "./workspaceSync";
 import StageTodos from "./StageTodos";
 import {
   loadStages,
@@ -104,12 +105,18 @@ export default function ResearchWorkspace({
     try {
       localStorage.setItem(stagesKey(project.id), JSON.stringify(state));
       setSaveError("");
+      window.dispatchEvent(new Event(WORKFLOW_CHANGED));
     } catch {
       setSaveError(
         "Stage changes could not be saved. Browser storage may be full or unavailable.",
       );
     }
   }, [project.id, state]);
+  useEffect(() => {
+    const refresh = () => setState(loadStages(project.id));
+    window.addEventListener(WORKFLOW_RESTORED, refresh);
+    return () => window.removeEventListener(WORKFLOW_RESTORED, refresh);
+  }, [project.id]);
   const updateStage = (i: number, changes: Partial<StageData>) =>
     setState((s) => ({
       ...s,

@@ -1,4 +1,7 @@
 import { expect, type Page } from "@playwright/test";
+export function createDriveMockState() {
+  return { files: [] as any[], contents: new Map<string, Buffer>(), serial: 0 };
+}
 export async function mockGoogle(
   page: Page,
   options: {
@@ -7,11 +10,11 @@ export async function mockGoogle(
     configured?: boolean;
     expire?: number;
   } = {},
+  backend = createDriveMockState(),
 ) {
-  const files: any[] = [];
-  const contents = new Map<string, Buffer>();
-  let serial = 0,
-    failUploads = 0,
+  const { files, contents } = backend;
+  let failUploads = 0,
+    failWorkspaceUploads = 0,
     profileRequests = 0,
     rejectProfile = false;
   await page.route("**/researchos/google-config.json", (route) =>
@@ -54,26 +57,29 @@ export async function mockGoogle(
       });
     }
     if (url.pathname.startsWith("/upload/")) {
-      if (failUploads > 0) {
-        failUploads--;
-        return route.fulfill({
-          status: 503,
-          json: { error: { message: "Simulated upload interruption" } },
-        });
-      }
       const body = request.postDataBuffer()!;
       const separator = body.indexOf("\r\n\r\n");
       const jsonEnd = body.indexOf("\r\n--", separator + 4);
       const metadata = JSON.parse(
         body.subarray(separator + 4, jsonEnd).toString(),
       );
+      const workspace = metadata.appProperties?.researchosWorkspace;
+      if (workspace ? failWorkspaceUploads > 0 : failUploads > 0) {
+        if (workspace) failWorkspaceUploads--;
+        else failUploads--;
+        return route.fulfill({
+          status: 503,
+          json: { error: { message: "Simulated upload interruption" } },
+        });
+      }
       const dataStart = body.indexOf("\r\n\r\n", jsonEnd + 2) + 4;
       const dataEnd = body.lastIndexOf("\r\n--");
-      const id = "file-" + ++serial;
+      const id = "file-" + ++backend.serial;
       const file = {
         id,
         mimeType: "application/octet-stream",
         ...metadata,
+        createdTime: new Date(1792530000000 + backend.serial).toISOString(),
         webViewLink: "https://drive.google.com/file/d/" + id + "/view",
       };
       files.push(file);
@@ -82,7 +88,10 @@ export async function mockGoogle(
     }
     const id = url.pathname.split("/").pop()!;
     if (request.method() === "POST") {
-      const file = { id: "folder-" + ++serial, ...request.postDataJSON() };
+      const file = {
+        id: "folder-" + ++backend.serial,
+        ...request.postDataJSON(),
+      };
       files.push(file);
       return route.fulfill({ json: file });
     }
@@ -122,6 +131,9 @@ export async function mockGoogle(
     },
     failNextUpload: () => {
       failUploads++;
+    },
+    failNextWorkspaceUpload: () => {
+      failWorkspaceUploads++;
     },
   };
 }

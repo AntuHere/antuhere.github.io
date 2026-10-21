@@ -221,6 +221,54 @@ export class DriveClient {
       )
     ).blob();
   }
+  private async workspaceFolder() {
+    const root = await this.root();
+    return this.folder(
+      "workspace-sync",
+      "Workspace sync",
+      "researchosWorkspaceSync",
+      "v1",
+      root.id,
+    );
+  }
+  async workspaceVersions() {
+    return this.list(
+      "trashed = false and appProperties has { key='researchosWorkspace' and value='v1' }",
+    );
+  }
+  async createWorkspaceVersion(
+    content: string,
+    appProperties: Record<string, string>,
+  ) {
+    const folder = await this.workspaceFolder();
+    const metadata = {
+      name:
+        "Workspace " + new Date().toISOString().replace(/[:.]/g, "-") + ".json",
+      mimeType: "application/json",
+      parents: [folder.id],
+      appProperties,
+    };
+    const boundary = "researchos-" + crypto.randomUUID();
+    const body = new Blob([
+      "--" +
+        boundary +
+        "\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n",
+      JSON.stringify(metadata),
+      "\r\n--" + boundary + "\r\nContent-Type: application/json\r\n\r\n",
+      content,
+      "\r\n--" + boundary + "--\r\n",
+    ]);
+    const response = await this.request(
+      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=" +
+        fields,
+      {
+        method: "POST",
+        headers: { "Content-Type": "multipart/related; boundary=" + boundary },
+        body,
+      },
+    );
+    return (await response.json()) as DriveFile;
+  }
   async trash(id: string) {
     await this.request(
       "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(id),
