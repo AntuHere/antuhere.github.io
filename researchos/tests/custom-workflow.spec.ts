@@ -15,6 +15,19 @@ test("each pipeline stage has editable personal work steps and sticky notes, iso
   await page.goto("/researchos/");
   await adminSignIn(page);
   await navigate(page, "Rickshaw PUDO");
+  await expect(
+    page.locator(".detail-stats,.detail-content,.detail-task-list"),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Next steps", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Research objective", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Project contents", exact: true }),
+  ).toHaveCount(0);
+
   const pipeline = page.locator(".rw-stages"),
     notes = page.getByRole("region", {
       name: "Stage sticky notes",
@@ -183,13 +196,11 @@ test("old JSON backups restore stage text while malformed custom steps cannot re
   }));
   await navigate(page, "Settings");
   page.once("dialog", (dialog) => dialog.accept());
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "legacy-backup.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(backup)),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "legacy-backup.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(backup)),
+  });
   await expect(
     page.getByText("Backup restored", { exact: true }),
   ).toBeVisible();
@@ -213,13 +224,11 @@ test("old JSON backups restore stage text while malformed custom steps cannot re
   await page.evaluate(() => {
     window.confirm = () => true;
   });
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "invalid-workflow.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(bad)),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "invalid-workflow.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(bad)),
+  });
   await expect(page.getByText(/Could not restore backup/)).toBeVisible();
   expect(
     await page.evaluate(() => localStorage.getItem("researchos-stages-pudo")),

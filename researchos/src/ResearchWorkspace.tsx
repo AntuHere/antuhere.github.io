@@ -286,15 +286,6 @@ export default function ResearchWorkspace({
             </div>
             <div className="rw-actions">
               <button
-                className="rw-button primary"
-                onClick={() =>
-                  onCreate("task", { projectId: project.id, title: "" })
-                }
-              >
-                <Plus size={15} />
-                Add research task
-              </button>
-              <button
                 className="rw-button"
                 disabled={stage === 8}
                 onClick={() => setStage((i) => Math.min(8, i + 1))}

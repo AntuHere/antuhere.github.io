@@ -101,9 +101,8 @@ test("create and edit a project, complete a task, and persist a note", async ({
   await expect(
     page.getByText("A longitudinal survey", { exact: true }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Add research task", exact: true })
-    .click();
+  await page.getByRole("tab", { name: "Tasks", exact: true }).click();
+  await page.getByRole("button", { name: "Add task", exact: true }).click();
   await dialog.getByLabel("Task title").fill("Collect field observations");
   await dialog.getByRole("button", { name: "Save to workspace" }).click();
   await page.getByRole("tab", { name: "Research notes", exact: true }).click();
@@ -192,13 +191,11 @@ test("project stages remain isolated and JSON backup restores custom work steps 
   ).toHaveCount(0);
   await navigate(page, "Settings");
   page.once("dialog", (dialog) => dialog.accept());
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "backup.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(data)),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "backup.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(data)),
+  });
   await expect(
     page.getByText("Backup restored", { exact: true }),
   ).toBeVisible();
@@ -214,13 +211,11 @@ test("project stages remain isolated and JSON backup restores custom work steps 
     "Rickshaw observations",
   );
   await navigate(page, "Settings");
-  await page
-    .locator("input[type=file]")
-    .setInputFiles({
-      name: "bad.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"projects":[],"tasks":[]}'),
-    });
+  await page.locator("input[type=file]").setInputFiles({
+    name: "bad.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{"projects":[],"tasks":[]}'),
+  });
   await expect(page.getByText(/Could not restore backup/)).toBeVisible();
   expect(
     await page.evaluate(
