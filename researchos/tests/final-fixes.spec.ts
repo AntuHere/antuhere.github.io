@@ -41,13 +41,12 @@ test('research illustration, five honest scopes and volunteering details render 
   await expect(cards).toHaveCount(5);
   const emergency = cards.filter({hasText: 'Emergency Vehicle Accessibility'});
   await emergency.getByText('Research Details', {exact: true}).click();
-  await expect(emergency).toContainText('Proposed research activities');
   await expect(emergency).toContainText('Methods under consideration');
   await expect(emergency).toContainText('Concept development and methodology exploration.');
   const curbside = cards.filter({hasText: 'Curbside Occupancy and Traffic Disruption'});
   await curbside.getByText('Research Details', {exact: true}).click();
-  await expect(curbside).toContainText('Potential indicators');
-  await expect(curbside).toContainText('Following vehicle response');
+  await expect(curbside).toContainText('Field observations of curbside occupancy');
+  await expect(curbside.locator('.research-activities')).toHaveCount(0);
   await expect(page.locator('#volunteering')).toContainText('BB Mobile School');
   await expect(page.locator('#volunteering')).toContainText('Co-founder & Volunteer');
   await expect(page.locator('#volunteering .volunteering-gallery figure')).toHaveCount(2);

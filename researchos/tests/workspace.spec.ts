@@ -34,7 +34,8 @@ test("portfolio navigation and direct Pages paths work on desktop and phone", as
   ).toBeVisible();
   if (await page.locator(".menu-icon").isVisible())
     await page.locator(".menu-icon").click();
-  await page.getByRole("link", { name: "ResearchOS", exact: true }).click();
+  await expect(page.locator('header a[href="/researchos/"]')).toHaveCount(0);
+  await page.goto("/researchos/");
   await expect(page).toHaveURL(/\/researchos\/$/);
   await signIn(page);
   await expect(

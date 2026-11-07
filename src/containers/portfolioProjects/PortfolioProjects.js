@@ -36,7 +36,7 @@ export default function PortfolioProjects() {
       <div className="github-project-grid">
         {githubProjects.map(project => (
           <article className="github-project-card" key={project.repo}>
-            {project.image ? <figure><img src={project.image} alt={project.alt} loading="lazy" /><figcaption>Project output · {project.repo}</figcaption></figure> :
+            {project.image ? <figure><img src={project.image} alt={project.alt} loading="lazy" /><figcaption>{project.imageKind || "Project output"} · {project.repo}</figcaption></figure> :
               <div className="project-icon-row"><i className={"fa " + project.icon} aria-hidden="true" /><span>{project.category}</span></div>}
             <div className="github-project-body">
               {project.image && <p className="portfolio-eyebrow">{project.category}</p>}
