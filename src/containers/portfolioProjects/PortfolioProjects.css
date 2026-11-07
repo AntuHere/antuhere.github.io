@@ -1,0 +1,32 @@
+.portfolio-additions { scroll-margin-top: 95px; }
+.portfolio-section-intro { color: #626174; font-size: 16px; line-height: 1.7; margin-bottom: 28px; }
+.github-project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.github-project-card, .training-card { border: 1px solid #ded9eb; border-radius: 16px; overflow: hidden; background: #faf9fd; }
+.github-project-card { display: flex; flex-direction: column; min-width: 0; }
+.github-project-body { padding: 22px; display: flex; flex-direction: column; flex: 1; }
+.github-project-body h2, .training-card h2 { font-size: 21px; line-height: 1.4; margin: 0 0 10px; overflow-wrap: anywhere; }
+.github-project-body > p, .training-card > p, .training-card li { font-size: 15px; line-height: 1.75; color: #555366; }
+.github-project-body > p { margin: 0 0 18px; }
+.github-project-card figure { margin: 0; background: white; }
+.github-project-card figure img { display: block; width: 100%; height: 185px; object-fit: contain; }
+.github-project-card figcaption { color: #646174; font-size: 10px; padding: 8px 14px; border-bottom: 1px solid #ded9eb; }
+.project-icon-row { display: flex; align-items: center; gap: 12px; color: #64418c; padding: 22px 22px 0; font-size: 11px; }
+.project-icon-row i { font-size: 22px; }
+.github-project-tools { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: auto 0 20px; }
+.github-project-tools li { border: 1px solid #ded9eb; border-radius: 5px; padding: 4px 8px; font-size: 11px; line-height: 1.5; }
+.github-project-link, .training-card a { color: #61378b; font-size: 14px; font-weight: 700; text-underline-offset: 4px; }
+.github-project-link:focus-visible, .training-card a:focus-visible { outline: 2px solid #9575d6; outline-offset: 5px; }
+.training-card { padding: 30px; border-left: 4px solid #9475d3; }
+.training-heading { display: flex; align-items: flex-start; gap: 22px; }
+.training-monogram { padding: 17px 12px; background: #eee8f7; color: #5d3683; border-radius: 12px; font-size: 22px; font-weight: 700; letter-spacing: 2px; }
+.portfolio-eyebrow, .github-project-body > .portfolio-eyebrow { font-size: 10px; letter-spacing: 1px; color: #705094; line-height: 1.5; margin: 0 0 8px; }
+.training-meta { font-size: 12px; line-height: 1.7; color: #626174; }
+.training-card ul { padding-left: 20px; margin-bottom: 0; }
+.training-card li { margin: 8px 0; }
+.dark-mode .github-project-card, .dark-mode .training-card { background: #202737; border-color: #394156; }
+.dark-mode .github-project-body > p, .dark-mode .training-card > p, .dark-mode .training-card li, .dark-mode .portfolio-section-intro, .dark-mode .training-meta { color: #cbd1dd; }
+.dark-mode .github-project-link, .dark-mode .training-card a, .dark-mode .project-icon-row, .dark-mode .portfolio-eyebrow { color: #cfb6ff; }
+.dark-mode .training-monogram { background: #34304f; color: #d3c3ff; }
+.dark-mode .github-project-tools li { border-color: #46516a; }
+@media(max-width: 1100px) { .github-project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media(max-width: 600px) { .github-project-grid { grid-template-columns: minmax(0, 1fr); } .training-card { padding: 20px; } .training-heading { flex-direction: column; gap: 15px; } }

@@ -100,7 +100,7 @@ const techStack = {
     {
       Stack: "Programming & Data Analysis",
       level: "Research practice",
-      tools: "Python (Pandas, NumPy, Matplotlib, Seaborn, Jupyter Notebook), R, Microsoft Excel."
+      tools: "Python · Pandas · NumPy · Matplotlib · Seaborn · Jupyter · R · Excel."
     },
     {
       Stack: "Computer Vision & Deep Learning",
@@ -115,7 +115,7 @@ const techStack = {
     {
       Stack: "Machine Learning & Explainable AI",
       level: "Fundamentals / basic familiarity",
-      tools: "Familiarity with scikit-learn, regression and Random Forest. Basic familiarity with Decision Tree, XGBoost, LightGBM, SVM, KNN, Naive Bayes, SHAP, LIME and feature-importance analysis."
+      tools: "scikit-learn, regression and Random Forest; introductory work with boosting, classification, SHAP and LIME."
     },
     {
       Stack: "Research Methods",
@@ -130,7 +130,7 @@ const techStack = {
     {
       Stack: "GIS & Traffic Simulation",
       level: "Basic GIS / currently learning simulation",
-      tools: "Basic GIS: short course at the Institute of Water Modelling. Currently learning SUMO and PTV VISSIM."
+      tools: "ArcGIS and introductory MIKE 11 exposure through IWM training; currently learning SUMO and PTV VISSIM."
     }
   ],
   displayCodersrank: false

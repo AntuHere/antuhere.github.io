@@ -35,7 +35,7 @@ function Header() {
         <ul className={isDark ? "dark-menu menu" : "menu"}>
         {viewSkills && (
             <li>
-              <a href="#skills">Skills</a>
+              <a href="#expertise">Skills</a>
             </li>
           )}
           {viewExperience && (
@@ -53,6 +53,8 @@ function Header() {
             </li>
           )}
          
+          <li><a href="#training">Training</a></li>
+          <li><a href="#github-projects">Projects</a></li>
           <li>
             <a href="#contact">Contact Me</a>
           </li>

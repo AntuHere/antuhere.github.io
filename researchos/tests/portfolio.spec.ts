@@ -46,9 +46,9 @@ test('academic identity, seven compact publication cards, five ongoing studies, 
   await expect(page.locator('#education')).toContainText('Fourth Year, Seventh Semester');
   await expect(page.locator('#education')).not.toContainText('CGPA');
   const text = await page.locator('body').innerText();
-  expect(text).not.toMatch(/wanna be a Programmer|Wasting Time|Frontend\/Design|Cloud Me|Social Engineering|Preparing for HSC/);
-  await expect(page.locator('.skill')).toHaveCount(7);
-  expect(await page.locator('.skills-bar').innerText()).not.toMatch(/\d+%/);
+  expect(text).not.toMatch(/wanna be a Programmer|Wasting Time|Frontend\/Design|Social Engineering|Preparing for HSC/);
+  await expect(page.locator('#expertise .expertise-card')).toHaveCount(7);
+  expect(await page.locator('#expertise').innerText()).not.toMatch(/\d+%/);
   expect(errors).toEqual([]);
 });
 

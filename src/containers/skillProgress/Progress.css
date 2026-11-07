@@ -1,94 +1,10 @@
-/* Change colors in this file to style to your needs on a global level. 
-Certain colors are used for different and multiply types of elements. 
-For greater control over colors visit each components .scss file. */
-.meter {
-  height: 20px;
-  position: relative;
-  background: #f3efef;
-  border-radius: 25px;
-}
-
-.meter > span {
-  display: block;
-  height: 100%;
-  border-top-right-radius: 6px;
-  border-bottom-right-radius: 6px;
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
-  background-color: #aaa5ff;
-  position: relative;
-  overflow: hidden;
-}
-
-.skill {
-  line-height: 3.5vw;
-}
-
-.skill-bars {
-  font-size: 28px;
-  width: 40%;
-}
-
-.skills-container {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  width: 90%;
-  padding: 20px 10px;
-  margin: 0px auto;
-  margin-top: 2rem;
-}
-
-.skills-container > * {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-  margin-bottom: 30px;
-}
-
-.skills-image > img {
-  margin-left: 80px;
-  max-width: 90%;
-  height: auto;
-}
-
-/* Media Query */
-@media (max-width: 1456px) {
-  .skills-bar {
-    line-height: 4rem;
-  }
-  .skills-image {
-    display: none;
-    -webkit-box-ordinal-group: 3;
-        -ms-flex-order: 2;
-            order: 2;
-  }
-}
-
-@media (max-width: 768px) {
-  .skills-container {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
-  }
-  .skills-bar {
-    line-height: 3rem;
-    margin: 20px;
-  }
-  .skills-image {
-    display: none;
-    -webkit-box-ordinal-group: 3;
-        -ms-flex-order: 2;
-            order: 2;
-  }
-}
-/*# sourceMappingURL=Progress.css.map */
-/* Keep the existing rounded accent bands; levels are descriptive, not scores. */
-.meter.skill-level { height: auto; }
-.meter.skill-level > span {
-  padding: 6px 14px;
-  font-size: 16px;
-  line-height: 1.5;
-}
-.skill .skill-tools { font-size: 17px; line-height: 1.6; margin-bottom: 28px; }
+.expertise-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.expertise-card { padding: 20px; border: 1px solid #ded9eb; border-radius: 14px; background: #faf9fd; }
+.expertise-card h2 { font-size: 17px; line-height: 1.4; margin: 0 0 9px; }
+.expertise-level { display: inline-block; font-size: 11px; line-height: 1.5; color: #5d3683; background: #eee8f7; padding: 4px 9px; border-radius: 6px; }
+.expertise-card p { font-size: 14px; line-height: 1.65; color: #555366; margin: 12px 0 0; }
+.dark-mode .expertise-card { background: #202737; border-color: #394156; }
+.dark-mode .expertise-card p { color: #cbd1dd; }
+.dark-mode .expertise-level { background: #34304f; color: #d3c3ff; }
+@media(max-width: 1000px) { .expertise-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media(max-width: 600px) { .expertise-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; } .expertise-card { padding: 16px; } }
