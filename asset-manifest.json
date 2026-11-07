@@ -1,14 +1,13 @@
 {
-  "main.css": "static/css/main.34b7b4a9.css",
-  "main.css.map": "static/css/main.34b7b4a9.css.map",
-  "main.js": "static/js/main.4c9e5f15.js",
-  "main.js.map": "static/js/main.4c9e5f15.js.map",
-  "static/js/0.a0410401.chunk.js": "static/js/0.a0410401.chunk.js",
-  "static/js/0.a0410401.chunk.js.map": "static/js/0.a0410401.chunk.js.map",
+  "main.css": "static/css/main.4021deca.css",
+  "main.css.map": "static/css/main.4021deca.css.map",
+  "main.js": "static/js/main.9c33dd33.js",
+  "main.js.map": "static/js/main.9c33dd33.js.map",
+  "static/js/0.989b1acc.chunk.js": "static/js/0.989b1acc.chunk.js",
+  "static/js/0.989b1acc.chunk.js.map": "static/js/0.989b1acc.chunk.js.map",
   "static/media/Agustina.woff": "static/media/Agustina.21f233e1.woff",
   "static/media/BiamLogo.jpg": "static/media/BiamLogo.3f8158af.jpg",
   "static/media/DCLogo.png": "static/media/DCLogo.8da7c666.png",
   "static/media/Montserrat-Regular.ttf": "static/media/Montserrat-Regular.ee653992.ttf",
-  "static/media/manOnTable.svg": "static/media/manOnTable.52be3144.svg",
-  "static/media/skill.svg": "static/media/skill.34409398.svg"
+  "static/media/manOnTable.svg": "static/media/manOnTable.52be3144.svg"
 }
