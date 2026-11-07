@@ -30,3 +30,8 @@
 .dark-mode .github-project-tools li { border-color: #46516a; }
 @media(max-width: 1100px) { .github-project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media(max-width: 600px) { .github-project-grid { grid-template-columns: minmax(0, 1fr); } .training-card { padding: 20px; } .training-heading { flex-direction: column; gap: 15px; } }
+
+.training-certificate { margin: 26px 0 0; max-width: 660px; }
+.training-certificate img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid #ded9eb; box-sizing: border-box; }
+.training-certificate figcaption { font-size: 12px; line-height: 1.8; margin-top: 10px; }
+.training-certificate figcaption a { font-size: 12px; }

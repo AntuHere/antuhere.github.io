@@ -1,4 +1,5 @@
 import React from "react";
+import iwmCertificate from "../../assets/images/certificate_iwm.jpeg";
 import {githubProjects} from "../../data/githubProjects";
 import "./PortfolioProjects.css";
 
@@ -23,6 +24,12 @@ export function IndustrialTraining() {
           <li>Applied fluid mechanics and hydraulics concepts to river modelling and flood simulation workflows.</li>
           <li>Developed practical skills in GIS mapping, data preparation and integrated water management.</li>
         </ul>
+        <figure className="training-certificate">
+          <a href={iwmCertificate} target="_blank" rel="noopener noreferrer" aria-label="View IWM industrial training certificate at full size">
+            <img src={iwmCertificate} alt="Institute of Water Modelling Industrial Training Program certificate awarded to MD Nasfiqul Islam, 13 September to 4 October 2026" loading="lazy" />
+          </a>
+          <figcaption>Industrial Training Program · IWM · September–October 2026<br /><a href={iwmCertificate} target="_blank" rel="noopener noreferrer">View full-size certificate ↗</a></figcaption>
+        </figure>
       </article>
     </section>
   );
